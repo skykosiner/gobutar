@@ -1,6 +1,8 @@
 package budget
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Budget struct {
 	Unallocated    float64 `sql:"unallocated"`
@@ -20,7 +22,7 @@ func NewBudget(db *sql.DB) (Budget, error) {
 
 	var unallocated, allocated, currentBalance, allTimeSpent, allTimeSaved float64
 	for rows.Next() {
-		if err := rows.Scan(&unallocated, &allocated, &currentBalance, &allTimeSpent, &allTimeSaved); err != nil {
+		if err := rows.Scan(&currentBalance, &allTimeSpent, &allTimeSaved, &allocated, &unallocated); err != nil {
 			return Budget{}, err
 		}
 	}
@@ -32,4 +34,10 @@ func NewBudget(db *sql.DB) (Budget, error) {
 		allTimeSpent,
 		allTimeSaved,
 	}, nil
+}
+
+func (b *Budget) SetUnallocated(db *sql.DB, newAmount float64) error {
+	query := "UPDATE budget SET allocated = allocated + ?, unallocated = unallocated - ?"
+	_, err := db.Exec(query, newAmount, newAmount)
+	return err
 }

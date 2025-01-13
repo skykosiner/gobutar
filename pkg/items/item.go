@@ -1,6 +1,11 @@
 package items
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/skykosiner/gobutar/pkg/budget"
+)
 
 type Recurring string
 
@@ -32,4 +37,22 @@ func ParseRecurring(value string) (Recurring, error) {
 	default:
 		return "", fmt.Errorf("invalid recurring value: %s", value)
 	}
+}
+
+func AllocateMoneyForItem(itemID string, ammountToAlocate float64, db *sql.DB) error {
+	b, err := budget.NewBudget(db)
+	if err != nil {
+		return err
+	}
+
+	if ammountToAlocate > b.Unallocated {
+		return fmt.Errorf("You can't allocate money you don't have")
+	}
+
+	_, err = db.Exec(fmt.Sprintf("UPDATE items SET saved = saved + %.2f WHERE id = '%s'", ammountToAlocate, itemID))
+	if err != nil {
+		return err
+	}
+
+	return b.SetUnallocated(db, ammountToAlocate)
 }

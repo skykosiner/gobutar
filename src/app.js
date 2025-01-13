@@ -66,10 +66,26 @@ percentageLines.forEach(line => {
     const price = parseFloat(line.getAttribute("data-price"));
     const saved = parseFloat(line.getAttribute("data-saved"));
 
-    console.log(saved, price);
     const savedPercentage = price > 0 ? (saved / price) * 100 : 0;
-    console.log(savedPercentage);
     const fillElement = line.querySelector(".percentage-fill");
     //@ts-ignore
     fillElement.style.width = `${savedPercentage}%`;
 });
+
+const updateAllocate = document.forms["updateAllocateitem2"]
+
+updateAllocate.addEventListener("submit", function (event) {
+    event.preventDefault();
+    fetch(`/api/item/allocate?id=item2`, {
+        method: "POST",
+        body: JSON.stringify({
+            //@ts-ignore
+            ammountToAllocate: parseFloat(document.getElementById("newAllocateitem2").value),
+        })
+    }).then(async resp => {
+        if (resp.ok) {
+            window.location.href = "/";
+        }
+    })
+})
+

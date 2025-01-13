@@ -12,6 +12,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/skykosiner/gobutar/pkg/budget"
+	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
 	"github.com/skykosiner/gobutar/pkg/utils"
 )
@@ -23,7 +24,8 @@ type Page struct {
 
 var (
 	templates = template.Must(template.New("base").Funcs(template.FuncMap{
-		"formatFloat": utils.FormatFloat,
+		"formatFloat":     utils.FormatFloat,
+		"formatRecurring": utils.FormatRecurring,
 	}).ParseGlob("src/*.html"))
 )
 
@@ -187,6 +189,47 @@ func main() {
 			Sections: sectionsSlice,
 		})
 		w.WriteHeader(http.StatusOK)
+	})
+
+	http.HandleFunc("/api/item/allocate", func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+		if id == "" {
+			http.Error(w, "Please provide an ID.", http.StatusBadRequest)
+			return
+		}
+
+		var ammountToAllocate struct {
+			AmmountToAllocate float64 `json:"ammountToAllocate"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&ammountToAllocate); err != nil {
+			slog.Error("Error getting body of ammount to alocate.", "error", err)
+			return
+		}
+
+		fmt.Println(ammountToAllocate)
+
+		if err := items.AllocateMoneyForItem(id, ammountToAllocate.AmmountToAllocate, db); err != nil {
+			slog.Error("Seems to be an error", "error", err)
+			http.Error(w, "Sorry there was a problem", http.StatusBadRequest)
+			return
+		}
+
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
+
+		budget, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
+
+		renderTemplate(w, "index", Page{
+			Budget:   budget,
+			Sections: sectionsSlice,
+		})
 	})
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
