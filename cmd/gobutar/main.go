@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/skykosiner/gobutar/pkg/sections"
 )
 
 func main() {
@@ -51,6 +53,12 @@ func main() {
 	if err != nil {
 		slog.Error("Error creating database tables", "error", err)
 		return
+	}
+
+	sections, _ := sections.GetSections(db)
+
+	for _, section := range sections {
+		fmt.Println(section)
 	}
 
 	fs := http.FileServer(http.Dir("./src"))
