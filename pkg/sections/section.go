@@ -90,9 +90,12 @@ LEFT JOIN
 	return sections, nil
 }
 
-func EditSectionName(db *sql.DB, sectionID int, newName string) error {
+func EditSectionName(db *sql.DB, sectionID int, name string) error {
+	_, err := db.Exec(fmt.Sprintf("UPDATE sections SET name = '%s' WHERE id = %d", name, sectionID))
+	return err
+}
 
-	fmt.Println(newName, sectionID)
-	_, err := db.Exec(fmt.Sprintf("UPDATE sections SET name = '%s' WHERE id = %d", newName, sectionID))
+func EditSectionColor(db *sql.DB, sectionID, color string) error {
+	_, err := db.Exec(fmt.Sprintf("UPDATE sections SET color = '%s' WHERE id = %s", color, sectionID))
 	return err
 }

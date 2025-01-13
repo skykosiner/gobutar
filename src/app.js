@@ -22,18 +22,29 @@ sections.map(section => {
         event.preventDefault();
 
         const formData = new FormData(updateSectionTitle);
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
         fetch(`/api/section/new-name?id=${id}`, {
             method: "POST",
             body: formData,
         }).then(async resp => {
             if (resp.ok) {
-                const newName = await resp.text();
-                const sectionTitle = section.querySelector("h2");
-                sectionTitle.textContent = newName;
+                window.location.href = "/";
+            }
+        })
+    })
+
+    /** @type {HTMLFormElement} */
+    const updateSectionColor = document.forms[`updateSectionColor${id}`]
+
+    updateSectionColor.addEventListener("submit", function (event) {
+        event.preventDefault();
+        fetch(`/api/section/new-color?id=${id}`, {
+            method: "POST",
+            body: JSON.stringify({
+                //@ts-ignore
+                newColor: document.getElementById(`newColor${id}`).value
+            })
+        }).then(async resp => {
+            if (resp.ok) {
                 window.location.href = "/";
             }
         })

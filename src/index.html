@@ -91,6 +91,11 @@
                     <input type="text" id="newName{{.ID}}" name="newName" />
                     <input type="submit" />
                 </form>
+
+                <form name="updateSectionColor{{.ID}}">
+                    <input type="text" id="newColor{{.ID}}" name="newColor" value="{{.Color}}" />
+                    <input type="submit" />
+                </form>
             </div>
 
             {{ range .Items }}
