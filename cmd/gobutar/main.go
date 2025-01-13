@@ -8,8 +8,14 @@ import (
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/sections"
 )
+
+type Page struct {
+	Budget   budget.Budget
+	Sections []sections.Section
+}
 
 var (
 	templates = template.Must(template.ParseGlob("src/*.html"))
@@ -67,10 +73,23 @@ func main() {
 		return
 	}
 
-	sections, _ := sections.GetSections(db)
+	sections, err := sections.GetSections(db)
+	if err != nil {
+		slog.Error("Error getting sections", "error", err)
+		return
+	}
+
+	budget, err := budget.NewBudget(db)
+	if err != nil {
+		slog.Error("Error getting budget", "error", err)
+		return
+	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		renderTemplate(w, "index", sections)
+		renderTemplate(w, "index", Page{
+			Budget:   budget,
+			Sections: sections,
+		})
 	})
 
 	if err := http.ListenAndServe(":42069", nil); err != nil {

@@ -25,13 +25,13 @@
 
         .section>div {
             width: 100%;
-            padding-top: 0.9rem;
-            padding-left: 1rem;
+            padding-top: 0.5rem;
         }
 
         .item {
             display: flex;
-            padding: 0.5rem;
+            padding-top: 0.2rem;
+            padding-left: 0.2rem;
         }
 
         .item>p {
@@ -40,7 +40,8 @@
     </style>
 
     <div class="section">
-        {{ range . }}
+        <p>Current Balance: {{ .Budget.CurrentBalance }}</p>
+        {{ range .Sections }}
         <div>
             <h2 style="background-color: {{ .Color}};">{{.Name}}</h2>
             {{ range .Items }}
@@ -54,6 +55,9 @@
         <p>No sections</p>
         {{ end }}
     </div>
+
+    <p>All Time Spent: {{ .Budget.AllTimeSpent}}</p>
+    <p>All Time Saved: {{ .Budget.AllTimeSaved}}</p>
 
     <script src=" ./app.js"></script>
 </body>
