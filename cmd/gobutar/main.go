@@ -18,15 +18,40 @@ func main() {
 
 	defer db.Close()
 
-	// _, err = db.Exec(`
-	// CREATE TABLE IF NOT EXISTS budget (
-	// 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	// 	name TEXT NOT NULL
-	// )
-	// `)
-	//
-	// if err != nil {
-	// }
+	_, err = db.Exec(`
+	CREATE TABLE IF NOT EXISTS items (
+		id TEXT NOT NULL PRIMARY KEY,
+		name TEXT NOT NULL,
+		price REAL NOT NULL,
+		recurring TEXT NOT NULL CHECK (recurring IN ('no', 'monthly', 'weekly', 'yearly', 'daily')),
+		section_id INTEGER NOT NULL,
+		FOREIGN KEY (section_id) REFERENCES sections (id) ON DELETE CASCADE
+	);
+
+	CREATE TABLE IF NOT EXISTS budget (
+		current_balance REAL NOT NULL DEFAULT 0.00,
+		all_time_spent REAL NOT NULL DEFAULT 0.00,
+		all_time_saved REAL NOT NULL DEFAULT 0.00
+	);
+
+	CREATE TABLE IF NOT EXISTS spent (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		purchase_date TEXT NOT NULL,
+		item_id TEXT NOT NULL,
+		FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+	);
+
+	CREATE TABLE IF NOT EXISTS sections (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		color TEXT NOT NULL
+	);
+	`)
+
+	if err != nil {
+		slog.Error("Error creating database tables", "error", err)
+		return
+	}
 
 	fs := http.FileServer(http.Dir("./src"))
 	http.Handle("/", fs)
