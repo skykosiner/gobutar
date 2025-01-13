@@ -13,7 +13,6 @@ sections.forEach(function (section) {
     sectionContainer.appendChild(section);
 });
 
-
 sections.map(section => {
     const id = section.getAttribute("data-id");
     /** @type {HTMLFormElement} */
@@ -39,4 +38,14 @@ sections.map(section => {
             }
         })
     })
+
+    const editButton = document.getElementById(`editButton${id}`)
+    editButton.addEventListener("click", function () {
+        const sectionEditor = document.getElementById(`sectionEditor${id}`)
+        if (window.getComputedStyle(sectionEditor).display == "none") {
+            sectionEditor.style.display = "block"
+        } else {
+            sectionEditor.style.display = "none"
+        }
+    });
 })
