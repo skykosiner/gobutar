@@ -1,3 +1,56 @@
+const template = document.createElement('template');
+template.innerHTML = `
+    <style>
+        a {
+            color: #5899D9;
+            transition: 0.3s ease-in-out;
+        }
+
+        a:hover {
+            color: #3897D3;
+        }
+    .footer {
+        position: fixed;
+        bottom: 0rem;
+        width: 100%;
+        height: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #F1F1F1;
+    }
+
+    .footer * {
+        background-color: #F1F1F1;
+    }
+
+    .footer>p {
+        margin: 0;
+        padding: 0.1rem;
+    }
+
+
+    </style>
+    <footer class="footer">
+        <p id="footer-year">Gobutar ©</p>
+        <p>Created by <a href="https://skykosiner.com" target=" _blank">Sky Kosiner</a></p>
+    </footer>
+    `;
+
+class Footer extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: "open" });
+        const content = template.content.cloneNode(true);
+        this.shadowRoot.appendChild(content);
+        const dateSpan = this.shadowRoot.querySelector("#footer-year")
+        dateSpan.textContent += new Date().getFullYear().toString();
+    }
+}
+
+customElements.define("footer-component", Footer);
+
 const sectionContainer = document.getElementById("section");
 const sections = Array.from(sectionContainer.getElementsByClassName("section-item"));
 

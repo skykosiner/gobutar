@@ -16,10 +16,25 @@
         * {
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             font-family: 'Inter', sans-serif;
+        }
+
+        html,
+        body {
+            padding-bottom: 5rem;
+        }
+
+        a {
+            color: #5899D9;
+            transition: 0.3s ease-in-out;
+        }
+
+        a:hover {
+            color: #3897D3;
         }
 
         .section {
@@ -43,7 +58,7 @@
         }
 
         .item-wrap {
-            padding: 0.5rem;
+            padding: 0.2rem;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -77,6 +92,8 @@
         }
 
         .section-header {
+            width: 97%;
+            border-radius: 5px;
             display: flex;
             justify-content: space-between;
             padding: 0.5rem;
@@ -103,9 +120,11 @@
     <div class="section" id="section">
         {{ range .Sections }}
         <div class="section-item" data-name="{{.Name}}" data-id="{{.ID}}">
-            <div style="background-color: {{ .Color}};" class="section-header">
-                <h2>{{.Name}}</h2>
-                <button id="editButton{{.ID}}">Edit</button>
+            <div class="item-wrap">
+                <div style="background-color: {{ .Color}};" class="section-header">
+                    <h2>{{.Name}}</h2>
+                    <button id="editButton{{.ID}}">Edit</button>
+                </div>
             </div>
 
             <div class="edit-section" id="sectionEditor{{.ID}}">
@@ -135,6 +154,8 @@
 
     <p>All Time Spent: {{ .Budget.AllTimeSpent}}</p>
     <p>All Time Saved: {{ .Budget.AllTimeSaved}}</p>
+
+    <footer-component></footer-component>
 
     <script stype="module" src="/src/app.js"></script>
 </body>
