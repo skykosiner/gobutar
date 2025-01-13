@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
     <style>
         * {
             margin: 0;
@@ -39,18 +40,25 @@
         }
     </style>
 
-    <div class="section">
-        <p>Current Balance: {{ .Budget.CurrentBalance }}</p>
+    <p>Current Balance: {{ .Budget.CurrentBalance }}</p>
+
+    <div class="section" id="section">
         {{ range .Sections }}
-        <div>
+        <div class="section-item" data-name="{{.Name}}" data-id="{{.ID}}">
             <h2 style="background-color: {{ .Color}};">{{.Name}}</h2>
+
+            <form name="updateSectionTitle{{.ID}}">
+                <input type="text" id="newName{{.ID}}" name="newName" />
+                <input type="submit" />
+            </form>
+
             {{ range .Items }}
             <div class="item">
                 <h3>{{.Name}}</h3>
                 <p>£{{.Price}}</p>
             </div>
             {{ end }}
-        </diV>
+        </div>
         {{ else }}
         <p>No sections</p>
         {{ end }}
@@ -59,7 +67,7 @@
     <p>All Time Spent: {{ .Budget.AllTimeSpent}}</p>
     <p>All Time Saved: {{ .Budget.AllTimeSaved}}</p>
 
-    <script src=" ./app.js"></script>
+    <script stype="module" src="/src/app.js"></script>
 </body>
 
 </html>

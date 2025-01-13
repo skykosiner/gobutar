@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -73,24 +75,60 @@ func main() {
 		return
 	}
 
-	sections, err := sections.GetSections(db)
-	if err != nil {
-		slog.Error("Error getting sections", "error", err)
-		return
-	}
-
-	budget, err := budget.NewBudget(db)
-	if err != nil {
-		slog.Error("Error getting budget", "error", err)
-		return
-	}
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
+
+		budget, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
+
 		renderTemplate(w, "index", Page{
 			Budget:   budget,
-			Sections: sections,
+			Sections: sectionsSlice,
 		})
 	})
+
+	http.HandleFunc("/api/section/new-name", func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			http.Error(w, "Unable to parse form", http.StatusInternalServerError)
+			return
+		}
+
+		id := r.URL.Query().Get("id")
+		if id == "" {
+			http.Error(w, "Please provide an ID.", http.StatusBadRequest)
+			return
+		}
+
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Please provide a valid ID.", http.StatusBadRequest)
+			return
+		}
+
+		newName := r.FormValue("newName")
+		fmt.Println(newName)
+		if len(newName) == 0 {
+			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
+			return
+		}
+
+		if err := sections.EditSectionName(db, idInt, newName); err != nil {
+			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
+			return
+		}
+
+		fmt.Fprint(w, newName)
+		w.WriteHeader(http.StatusOK)
+	})
+
+	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
 
 	if err := http.ListenAndServe(":42069", nil); err != nil {
 		slog.Error("Error starting webserver", "error", err)
