@@ -114,3 +114,16 @@ sections.map(section => {
         }
     });
 })
+
+const percentageLines = document.querySelectorAll(".percentage-line");
+percentageLines.forEach(line => {
+    const price = parseFloat(line.getAttribute("data-price"));
+    const saved = parseFloat(line.getAttribute("data-saved"));
+
+    console.log(saved, price);
+    const savedPercentage = price > 0 ? (saved / price) * 100 : 0;
+    console.log(savedPercentage);
+    const fillElement = line.querySelector(".percentage-fill");
+    //@ts-ignore
+    fillElement.style.width = `${savedPercentage}%`;
+});

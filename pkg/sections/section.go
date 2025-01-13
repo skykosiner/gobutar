@@ -27,6 +27,7 @@ func GetSections(db *sql.DB) ([]Section, error) {
     i.id AS item_id,
     i.name AS item_name,
     i.price AS item_price,
+    i.saved AS item_saved,
     i.recurring AS item_recurring,
     i.section_id AS item_section_id
 FROM
@@ -46,12 +47,12 @@ LEFT JOIN
 		var sectionID int
 		var sectionName, sectionColor string
 		var itemID, itemName, itemRecurring sql.NullString
-		var itemPrice sql.NullFloat64
+		var itemPrice, itemSaved sql.NullFloat64
 		var itemSectionID sql.NullInt64
 
 		err := rows.Scan(
 			&sectionID, &sectionName, &sectionColor,
-			&itemID, &itemName, &itemPrice, &itemRecurring, &itemSectionID,
+			&itemID, &itemName, &itemPrice, &itemSaved, &itemRecurring, &itemSectionID,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
@@ -76,6 +77,7 @@ LEFT JOIN
 				ID:        itemID.String,
 				Name:      itemName.String,
 				Price:     itemPrice.Float64,
+				Saved:     itemSaved.Float64,
 				Recurring: recuring,
 				SectionID: int(itemSectionID.Int64),
 			})

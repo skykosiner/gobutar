@@ -16,6 +16,7 @@ type Item struct {
 	ID        string    `json:"id" sql:"id"`
 	Name      string    `json:"name" sql:"name"`
 	Price     float64   `json:"price" sql:"price"`
+	Saved     float64   `json:"saved" sql:"saved"`
 	Recurring Recurring `json:"recurring" sql:"recurring"`
 	SectionID int       `json:"section_id" sql:"section_id"`
 }

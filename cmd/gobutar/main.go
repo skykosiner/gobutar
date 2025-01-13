@@ -46,6 +46,7 @@ func main() {
 		id TEXT NOT NULL PRIMARY KEY,
 		name TEXT NOT NULL,
 		price REAL NOT NULL,
+		saved REAL NOT NULL DEFAULT 0.00,
 		recurring TEXT NOT NULL CHECK (recurring IN ('no', 'monthly', 'weekly', 'yearly', 'daily')),
 		section_id INTEGER NOT NULL,
 		FOREIGN KEY (section_id) REFERENCES sections (id) ON DELETE CASCADE

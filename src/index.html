@@ -51,6 +51,7 @@
 
         .item {
             display: flex;
+            flex-direction: column;
             padding: 0.5rem;
             background-color: #F1F1F1;
             border-radius: 5px;
@@ -113,6 +114,27 @@
         .section-header>button:hover {
             background: #444444;
         }
+
+        .percentage-line {
+            width: 100%;
+            height: 20px;
+            background: #f1f1f1;
+            position: relative;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .percentage-fill {
+            height: 100%;
+            background: #20E5A4;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .price {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 
     <p>Current Balance: {{ .Budget.CurrentBalance }}</p>
@@ -142,7 +164,14 @@
                 {{ range .Items }}
                 <div class="item">
                     <h3>{{.Name}}</h3>
-                    <p>£{{.Price}}</p>
+                    <div class="percentage-line" data-price="{{.Price}}" data-saved="{{.Saved}}">
+                        <div class="percentage-fill"></div>
+                    </div>
+                    <!-- style="background: linear-gradient(to right, #20E5A4 {{.Price}}%, #F1F1F1F1 {{.Saved}}%);"> -->
+                    <div class="price">
+                        <p>£{{.Saved}}</p>
+                        <p>£{{.Price}}</p>
+                    </div>
                 </div>
                 {{ end }}
             </div>
