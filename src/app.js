@@ -1,14 +1,15 @@
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
-        a {
-            color: #5899D9;
-            transition: 0.3s ease-in-out;
-        }
+    a {
+        color: #5899D9;
+        transition: 0.3s ease-in-out;
+    }
 
-        a:hover {
-            color: #3897D3;
-        }
+    a:hover {
+        color: #3897D3;
+    }
+
     .footer {
         position: fixed;
         bottom: 0rem;
