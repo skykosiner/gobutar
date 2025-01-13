@@ -131,6 +131,22 @@ func main() {
 			return
 		}
 
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
+
+		budget, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
+
+		renderTemplate(w, "index", Page{
+			Budget:   budget,
+			Sections: sectionsSlice,
+		})
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -154,6 +170,22 @@ func main() {
 			return
 		}
 
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
+
+		budget, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
+
+		renderTemplate(w, "index", Page{
+			Budget:   budget,
+			Sections: sectionsSlice,
+		})
 		w.WriteHeader(http.StatusOK)
 	})
 
