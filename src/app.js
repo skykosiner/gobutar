@@ -72,20 +72,24 @@ percentageLines.forEach(line => {
     fillElement.style.width = `${savedPercentage}%`;
 });
 
-const updateAllocate = document.forms["updateAllocateitem2"]
+const itemContainer = document.querySelectorAll("#items");
+itemContainer.forEach(item => {
+    const id = item.querySelector(".item").getAttribute("data-id");
+    console.log(id);
+    const updateAllocate = document.forms[`updateAllocate${id}`]
 
-updateAllocate.addEventListener("submit", function (event) {
-    event.preventDefault();
-    fetch(`/api/item/allocate?id=item2`, {
-        method: "POST",
-        body: JSON.stringify({
-            //@ts-ignore
-            ammountToAllocate: parseFloat(document.getElementById("newAllocateitem2").value),
+    updateAllocate.addEventListener("submit", function (event) {
+        event.preventDefault();
+        fetch(`/api/item/allocate?id=${id}`, {
+            method: "POST",
+            body: JSON.stringify({
+                //@ts-ignore
+                ammountToAllocate: parseFloat(document.getElementById(`newAllocate${id}`).value),
+            })
+        }).then(async resp => {
+            if (resp.ok) {
+                window.location.href = "/";
+            }
         })
-    }).then(async resp => {
-        if (resp.ok) {
-            window.location.href = "/";
-        }
     })
 })
-

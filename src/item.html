@@ -34,9 +34,9 @@
         justify-content: space-between;
     }
 </style>
-<div class="item-wrap">
+<div class="item-wrap" id="items">
     {{ range .Items }}
-    <div class="item">
+    <div class="item" data-id="{{.ID}}">
         <h3>{{ .Name }}</h3>
         <div class="percentage-line" data-price="{{.Price}}" data-saved="{{.Saved}}">
             <div class="percentage-fill"></div>
