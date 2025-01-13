@@ -117,7 +117,7 @@
 
         .percentage-line {
             width: 100%;
-            height: 20px;
+            height: 0.937rem;
             background: #f1f1f1;
             position: relative;
             margin: 10px 0;
@@ -135,9 +135,19 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .stats {
+            padding: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 
-    <p>Current Balance: {{ .Budget.CurrentBalance }}</p>
+    <div class="stats">
+        <p>Allocated: £{{ formatFloat .Budget.Allocated }}</p>
+        <p>Unallocetd: £{{ formatFloat .Budget.Unallocated }}</p>
+        <p>Current Balance: £{{ formatFloat .Budget.CurrentBalance }}</p>
+    </div>
 
     <div class="section" id="section">
         {{ range .Sections }}
@@ -167,10 +177,9 @@
                     <div class="percentage-line" data-price="{{.Price}}" data-saved="{{.Saved}}">
                         <div class="percentage-fill"></div>
                     </div>
-                    <!-- style="background: linear-gradient(to right, #20E5A4 {{.Price}}%, #F1F1F1F1 {{.Saved}}%);"> -->
                     <div class="price">
-                        <p>£{{.Saved}}</p>
-                        <p>£{{.Price}}</p>
+                        <p>£{{ formatFloat .Saved }}</p>
+                        <p>£{{ formatFloat .Price }}</p>
                     </div>
                 </div>
                 {{ end }}
@@ -181,8 +190,10 @@
         {{ end }}
     </div>
 
-    <p>All Time Spent: {{ .Budget.AllTimeSpent}}</p>
-    <p>All Time Saved: {{ .Budget.AllTimeSaved}}</p>
+    <div class="stats">
+        <p>All Time Spent: £{{ formatFloat .Budget.AllTimeSpent }}</p>
+        <p>All Time Saved: £{{ formatFloat .Budget.AllTimeSaved }}</p>
+    </div>
 
     <footer-component></footer-component>
 

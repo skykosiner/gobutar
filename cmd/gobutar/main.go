@@ -13,6 +13,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/sections"
+	"github.com/skykosiner/gobutar/pkg/utils"
 )
 
 type Page struct {
@@ -21,7 +22,9 @@ type Page struct {
 }
 
 var (
-	templates = template.Must(template.ParseGlob("src/*.html"))
+	templates = template.Must(template.New("base").Funcs(template.FuncMap{
+		"formatFloat": utils.FormatFloat,
+	}).ParseGlob("src/*.html"))
 )
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
@@ -53,6 +56,8 @@ func main() {
 	);
 
 	CREATE TABLE IF NOT EXISTS budget (
+		allocated REAL NOT NULL DEFAULT 0.00,
+		unallocated REAL NOT NULL DEFAULT 0.00,
 		current_balance REAL NOT NULL DEFAULT 0.00,
 		all_time_spent REAL NOT NULL DEFAULT 0.00,
 		all_time_saved REAL NOT NULL DEFAULT 0.00
