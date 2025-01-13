@@ -1,8 +1,7 @@
-package main
+package budget
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type Budget struct {
@@ -31,25 +30,4 @@ func NewBudget(db *sql.DB) (Budget, error) {
 		AllTimeSaved:    allTimeSaved,
 		CurrentBallance: currentBallance,
 	}, nil
-}
-
-func (b Budget) GetDateSpent(day, month, year int) ([]Spend, error) {
-	var spent []Spend
-	rows, err := b.DB.Query(fmt.Sprintf("GET * FROM spent WHERE date is = '%d/%d/%d'", day, month, year))
-	if err != nil {
-		return spent, err
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		var item Spend
-		if err := rows.Scan(&item.Date, &item.item.Type, &item.item.Name, &item.item.Price, &item.item.RecurringDate); err != nil {
-			return spent, err
-		}
-
-		spent = append(spent, item)
-	}
-
-	return spent, nil
 }

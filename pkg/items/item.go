@@ -1,4 +1,4 @@
-package main
+package items
 
 type ItemType int
 
@@ -8,6 +8,7 @@ const (
 )
 
 type Item struct {
+	ID            string
 	RecurringDate int
 	Price         float64
 	Type          ItemType
