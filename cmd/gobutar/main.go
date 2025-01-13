@@ -2,14 +2,26 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/skykosiner/gobutar/pkg/sections"
 )
+
+var (
+	templates = template.Must(template.ParseGlob("src/*.html"))
+)
+
+func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
+	w.Header().Set("Content-Type", "text/html")
+	if err := templates.ExecuteTemplate(w, tmpl, data); err != nil {
+		slog.Error("Error rendering template", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
 
 func main() {
 	db, err := sql.Open("sqlite3", "./gobutar.db")
@@ -57,12 +69,9 @@ func main() {
 
 	sections, _ := sections.GetSections(db)
 
-	for _, section := range sections {
-		fmt.Println(section)
-	}
-
-	fs := http.FileServer(http.Dir("./src"))
-	http.Handle("/", fs)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "index", sections)
+	})
 
 	if err := http.ListenAndServe(":42069", nil); err != nil {
 		slog.Error("Error starting webserver", "error", err)

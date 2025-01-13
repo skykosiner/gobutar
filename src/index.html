@@ -1,12 +1,63 @@
+{{ block "index" . }}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Gobutar</title>
-    </head>
-    <body>
-        <h1>Hello World</h1>
-        <script src="./app.js"></script>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gobutar</title>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .section>div {
+            width: 100%;
+            padding-top: 0.9rem;
+            padding-left: 1rem;
+        }
+
+        .item {
+            display: flex;
+            padding: 0.5rem;
+        }
+
+        .item>p {
+            padding-left: 0.5rem;
+        }
+    </style>
+
+    <div class="section">
+        {{ range . }}
+        <div>
+            <h2 style="background-color: {{ .Color}};">{{.Name}}</h2>
+            {{ range .Items }}
+            <div class="item">
+                <h3>{{.Name}}</h3>
+                <p>£{{.Price}}</p>
+            </div>
+            {{ end }}
+        </diV>
+        {{ else }}
+        <p>No sections</p>
+        {{ end }}
+    </div>
+
+    <script src=" ./app.js"></script>
+</body>
+
 </html>
+
+{{ end }}
