@@ -9,6 +9,8 @@
 </head>
 
 <body>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter&family=Roboto&display=swap');
@@ -16,6 +18,7 @@
         * {
             margin: 0;
             padding: 0;
+            color: #111111;
             overflow-x: hidden;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
@@ -42,6 +45,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
 
         .stats {
@@ -51,20 +55,22 @@
         }
     </style>
 
+    {{ template "navbar" . }}
+
     <div class="stats">
         <p>Allocated: £{{ formatFloat .Budget.Allocated }}</p>
         <p>Unallocated: £{{ formatFloat .Budget.Unallocated }}</p>
         <p>Current Balance: £{{ formatFloat .Budget.CurrentBalance }}</p>
     </div>
 
-    {{template "section" .}}
+    {{ template "section" . }}
 
     <div class="stats">
         <p>All Time Spent: £{{ formatFloat .Budget.AllTimeSpent }}</p>
         <p>All Time Saved: £{{ formatFloat .Budget.AllTimeSaved }}</p>
     </div>
 
-    {{ template "footer" .}}
+    {{ template "footer" . }}
 
     <script stype="module" src="/src/app.js"></script>
 </body>

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/skykosiner/gobutar/pkg/budget"
 )
 
@@ -24,6 +25,17 @@ type Item struct {
 	Saved     float64   `json:"saved" sql:"saved"`
 	Recurring Recurring `json:"recurring" sql:"recurring"`
 	SectionID int       `json:"section_id" sql:"section_id"`
+}
+
+func NewItem(name string, price, saved float64, recurring Recurring, sectionID int) Item {
+	return Item{
+		ID:        uuid.New().String(),
+		Name:      name,
+		Price:     price,
+		Saved:     saved,
+		Recurring: recurring,
+		SectionID: sectionID,
+	}
 }
 
 func (i Item) String() string {
@@ -55,4 +67,10 @@ func AllocateMoneyForItem(itemID string, ammountToAlocate float64, db *sql.DB) e
 	}
 
 	return b.SetUnallocated(db, ammountToAlocate)
+}
+
+func SaveItem(db *sql.DB, item Item) error {
+	query := "INSERT INTO items (id, name, price, saved, recurring, section_id) VALUES (?,?,?,?,?,?)"
+	_, err := db.Exec(query, item.ID, item.Name, item.Price, item.Saved, item.Recurring, item.SectionID)
+	return err
 }

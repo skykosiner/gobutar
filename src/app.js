@@ -75,7 +75,6 @@ percentageLines.forEach(line => {
 const itemContainer = document.querySelectorAll("#items");
 itemContainer.forEach(item => {
     const id = item.querySelector(".item").getAttribute("data-id");
-    console.log(id);
     const updateAllocate = document.forms[`updateAllocate${id}`]
 
     updateAllocate.addEventListener("submit", function (event) {

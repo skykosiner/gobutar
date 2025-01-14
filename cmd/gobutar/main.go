@@ -122,7 +122,6 @@ func main() {
 		}
 
 		newName := r.FormValue("newName")
-		fmt.Println(newName)
 		if len(newName) == 0 {
 			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
 			return
@@ -206,8 +205,6 @@ func main() {
 			return
 		}
 
-		fmt.Println(ammountToAllocate)
-
 		if err := items.AllocateMoneyForItem(id, ammountToAllocate.AmmountToAllocate, db); err != nil {
 			slog.Error("Seems to be an error", "error", err)
 			http.Error(w, "Sorry there was a problem", http.StatusBadRequest)
@@ -230,6 +227,75 @@ func main() {
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
+	})
+
+	http.HandleFunc("/api/item/new", func(w http.ResponseWriter, r *http.Request) {
+		var newItem struct {
+			Name      string          `json:"name"`
+			Price     string          `json:"price"`
+			Saved     string          `json:"saved"`
+			Recurring items.Recurring `json:"recurring"`
+			SectionID string          `json:"section_id"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&newItem); err != nil {
+			slog.Error("Error getting body of ammount to alocate.", "error", err)
+			return
+		}
+
+		fmt.Println(newItem)
+
+		price, _ := strconv.ParseFloat(newItem.Price, 64)
+		saved, _ := strconv.ParseFloat(newItem.Saved, 64)
+		sectionID, _ := strconv.Atoi(newItem.SectionID)
+
+		item := items.NewItem(newItem.Name, price, saved, newItem.Recurring, sectionID)
+		if err := items.SaveItem(db, item); err != nil {
+			slog.Error("Couldn't save new item", "error", err, "new item", item)
+			http.Error(w, "Sorry there was a problem", http.StatusBadRequest)
+			return
+		}
+
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
+
+		budget, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
+
+		renderTemplate(w, "index", Page{
+			Budget:   budget,
+			Sections: sectionsSlice,
+		})
+	})
+
+	http.HandleFunc("/api/get-form-new-item", func(w http.ResponseWriter, r *http.Request) {
+		var sectionInfo []struct {
+			Name string
+			ID   int
+		}
+		s, err := sections.GetSections(db)
+		if err != nil {
+			http.Error(w, "Error getting your sections.", http.StatusInternalServerError)
+			return
+		}
+
+		for _, section := range s {
+			sectionInfo = append(sectionInfo, struct {
+				Name string
+				ID   int
+			}{
+				section.Name,
+				section.ID,
+			})
+		}
+
+		renderTemplate(w, "new-item", sectionInfo)
 	})
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
