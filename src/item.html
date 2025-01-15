@@ -34,26 +34,64 @@
         display: flex;
         justify-content: space-between;
     }
+
+    .item-options {
+        background-color: #FFFFFF;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 70%;
+        height: 100%;
+        display: none;
+        z-index: 100;
+    }
+
+    .item-options>button {
+        background: #FFFFFF;
+        border: none;
+        color: red;
+    }
 </style>
 <div class="item-wrap" id="items">
     {{ range .Items }}
-    <div class="item" data-id="{{.ID}}">
+    <div class="item" data-id="{{.ID}}" onclick="toggleOptions('{{.ID}}')">
         <h3>{{ .Name }}</h3>
         <div class="percentage-line" data-price="{{.Price}}" data-saved="{{.Saved}}">
             <div class="percentage-fill"></div>
         </div>
+
         <div class="price">
             <p>£{{ formatFloat .Saved }}</p>
             <p>{{ formatRecurring .Recurring }}</p>
             <p>£{{ formatFloat .Price }}</p>
         </div>
 
-        <div>
+        <div class="item-options" id="options{{.ID}}">
+            <button onclick="toggleOptions('{{.ID}}')">X</button>
+
+            <form>
+                <input type="text" name="name" value="{{.Name}}" />
+            </form>
+
             <form name="updateAllocate{{.ID}}">
-                <input type="text" id="newAllocate{{.ID}}" />
+                <input type="text" id="newAllocate{{.ID}}" placeholder="Enter Ammount: " />
             </form>
         </div>
     </div>
     {{ end }}
+
+    <script>
+        /**
+        * @param {string} id
+        */
+        function toggleOptions(id) {
+            const options = document.getElementById(`options${id}`);
+            if (window.getComputedStyle(options).display == "none") {
+                options.style.display = "block"
+            } else {
+                options.style.display = "none"
+            }
+        }
+    </script>
 </div>
-{{ end }}
+{{end}}
