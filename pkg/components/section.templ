@@ -1,0 +1,68 @@
+package components
+
+import (
+	"github.com/skykosiner/gobutar/pkg/sections"
+	"strconv"
+)
+
+css sectionWrap() {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 98%;
+}
+
+css editSection() {
+	z-index: 99;
+	display: none;
+	background-color: #F1F1F1;
+	position: fixed;
+	overflow: hidden;
+	height: 100vh;
+	width: 100%;
+}
+
+css sectionHeader(color string) {
+	background-color: { color };
+	width: 100%;
+	border-radius: 5px;
+	display: flex;
+	justify-content: space-between;
+	padding: 0.5rem;
+}
+
+css sectionHeaderButton() {
+	border: none;
+	background: #555555;
+	color: #FFFFFF;
+	height: 25px;
+	width: 50px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: 0.3s ease all;
+}
+
+templ section(sections []sections.Section) {
+	<div class={ sectionWrap() } id="section">
+		for _, section := range sections {
+			<div style="padding: 0.3rem;" data-name={ section.Name } data-id={ strconv.Itoa(section.ID) }>
+				<div>
+					<div class={ sectionHeader(section.Color) }>
+						<h2>{ section.Name }</h2>
+						<button class={ sectionHeaderButton() }>Edit</button>
+					</div>
+				</div>
+				<div class={ editSection() }>
+					<form>
+						<input type="text" name="newName" value={ section.Name }/>
+					</form>
+					<form>
+						<input type="color" value={ section.Color } style="border: none;"/>
+						<input type="submit"/>
+					</form>
+				</div>
+			</div>
+		}
+	</div>
+}

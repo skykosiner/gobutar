@@ -1,27 +1,35 @@
 package components
 
 import (
-"github.com/skykosiner/gobutar/pkg/budget"
-"github.com/skykosiner/gobutar/pkg/sections"
-"github.com/skykosiner/gobutar/pkg/utils"
+	"github.com/skykosiner/gobutar/pkg/budget"
+	"github.com/skykosiner/gobutar/pkg/sections"
+	"github.com/skykosiner/gobutar/pkg/utils"
 )
 
 type Page struct {
-Budget budget.Budget
-Sections []sections.Section
+	Budget   budget.Budget
+	Sections []sections.Section
 }
 
 templ Home(page Page) {
-<div>
-    <div>
-        <p>Allocated: £{ utils.FormatFloat(page.Budget.Allocated) }</p>
-        <p>Unallocated: £{ utils.FormatFloat(page.Budget.Unallocated) }</p>
-        <p>Current Balance: £{ utils.FormatFloat(page.Budget.CurrentBalance) }</p>
-    </div>
-    <div class="stats">
-        <p>All Time Spent: £{ utils.FormatFloat(page.Budget.AllTimeSpent) }</p>
-        <p>All Time Saved: £{ utils.FormatFloat(page.Budget.AllTimeSaved) }</p>
-    </div>
-    @footer()
-</div>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<link rel="stylesheet" href="/src/index.css"/>
+		<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+		<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+		<title>Gobutar</title>
+	</head>
+	@navbar()
+	<div class="stats">
+		<p>Allocated: £{ utils.FormatFloat(page.Budget.Allocated) }</p>
+		<p>Unallocated: £{ utils.FormatFloat(page.Budget.Unallocated) }</p>
+		<p>Current Balance: £{ utils.FormatFloat(page.Budget.CurrentBalance) }</p>
+	</div>
+	@section(page.Sections)
+	<div class="stats">
+		<p>All Time Spent: £{ utils.FormatFloat(page.Budget.AllTimeSpent) }</p>
+		<p>All Time Saved: £{ utils.FormatFloat(page.Budget.AllTimeSaved) }</p>
+	</div>
+	@footer()
 }
