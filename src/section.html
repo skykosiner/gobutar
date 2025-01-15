@@ -1,4 +1,4 @@
-{{ define "section" }}
+{{define "section"}}
 <style>
     .section {
         display: flex;
@@ -60,10 +60,10 @@
     }
 </style>
 <div class="section" id="section">
-    {{ range .Sections }}
+    {{range .Sections}}
     <div class="section-item" data-name="{{.Name}}" data-id="{{.ID}}">
         <div class="item-wrap">
-            <div style="background-color: {{ .Color}};" class="section-header">
+            <div style="background-color: {{.Color}};" class="section-header">
                 <h2>{{.Name}}</h2>
                 <button id="editButton{{.ID}}">Edit</button>
             </div>
@@ -80,10 +80,10 @@
             </form>
         </div>
 
-        {{ template "item" .}}
+        {{template "item" .}}
     </div>
-    {{ else }}
+    {{else}}
     <p>No sections</p>
-    {{ end }}
+    {{end}}
 </div>
-{{ end }}
+{{end}}

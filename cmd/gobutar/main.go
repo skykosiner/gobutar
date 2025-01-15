@@ -10,17 +10,14 @@ import (
 	"strconv"
 	"text/template"
 
+	"github.com/a-h/templ"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/skykosiner/gobutar/pkg/budget"
+	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
 	"github.com/skykosiner/gobutar/pkg/utils"
 )
-
-type Page struct {
-	Budget   budget.Budget
-	Sections []sections.Section
-}
 
 var (
 	templates = template.Must(template.New("base").Funcs(template.FuncMap{
@@ -97,7 +94,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", Page{
+		renderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -144,7 +141,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", Page{
+		renderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -183,7 +180,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", Page{
+		renderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -223,7 +220,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", Page{
+		renderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -268,7 +265,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", Page{
+		renderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -299,6 +296,23 @@ func main() {
 	})
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
+
+	sectionsSlice, err := sections.GetSections(db)
+	if err != nil {
+		slog.Error("Error getting sections", "error", err)
+		return
+	}
+
+	budget, err := budget.NewBudget(db)
+	if err != nil {
+		slog.Error("Error getting budget", "error", err)
+		return
+	}
+	component := components.Home(components.Page{
+		Budget:   budget,
+		Sections: sectionsSlice,
+	})
+	http.Handle("/test", templ.Handler(component))
 
 	if err := http.ListenAndServe(":42069", nil); err != nil {
 		slog.Error("Error starting webserver", "error", err)

@@ -1,5 +1,12 @@
-{{define "footer"}}
-<style>
+package components
+
+import (
+	"strconv"
+	"time"
+)
+
+templ footer() {
+	<style type="text/css">
     a {
         color: #5899D9;
         transition: 0.3s ease-in-out;
@@ -30,12 +37,8 @@
         padding: 0.1rem;
     }
 </style>
-<footer class="footer">
-    <p id="footer-year">Gobutar ©</p>
-    <p>Created by <a href="https://skykosiner.com" target=" _blank">Sky Kosiner</a></p>
-</footer>
-
-<script>
-    document.getElementById("footer-year").innerHTML += new Date().getFullYear();
-</script>
-{{end}}
+	<footer class="footer">
+		<p>Gobutar ©{ strconv.Itoa(time.Now().Year()) }</p>
+		<p>Created by <a href="https://skykosiner.com" target=" _blank">Sky Kosiner</a></p>
+	</footer>
+}

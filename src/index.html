@@ -55,22 +55,22 @@
         }
     </style>
 
-    {{ template "navbar" . }}
+    {{template "navbar" .}}
 
     <div class="stats">
-        <p>Allocated: £{{ formatFloat .Budget.Allocated }}</p>
-        <p>Unallocated: £{{ formatFloat .Budget.Unallocated }}</p>
-        <p>Current Balance: £{{ formatFloat .Budget.CurrentBalance }}</p>
+        <p>Allocated: £{{formatFloat .Budget.Allocated}}</p>
+        <p>Unallocated: £{{formatFloat .Budget.Unallocated}}</p>
+        <p>Current Balance: £{{formatFloat .Budget.CurrentBalance}}</p>
     </div>
 
-    {{ template "section" . }}
+    {{template "section" .}}
 
     <div class="stats">
-        <p>All Time Spent: £{{ formatFloat .Budget.AllTimeSpent }}</p>
-        <p>All Time Saved: £{{ formatFloat .Budget.AllTimeSaved }}</p>
+        <p>All Time Spent: £{{formatFloat .Budget.AllTimeSpent}}</p>
+        <p>All Time Saved: £{{formatFloat .Budget.AllTimeSaved}}</p>
     </div>
 
-    {{ template "footer" . }}
+    {{template "footer" .}}
 
     <script stype="module" src="/src/app.js"></script>
 </body>

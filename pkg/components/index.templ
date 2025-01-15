@@ -1,0 +1,27 @@
+package components
+
+import (
+"github.com/skykosiner/gobutar/pkg/budget"
+"github.com/skykosiner/gobutar/pkg/sections"
+"github.com/skykosiner/gobutar/pkg/utils"
+)
+
+type Page struct {
+Budget budget.Budget
+Sections []sections.Section
+}
+
+templ Home(page Page) {
+<div>
+    <div>
+        <p>Allocated: £{ utils.FormatFloat(page.Budget.Allocated) }</p>
+        <p>Unallocated: £{ utils.FormatFloat(page.Budget.Unallocated) }</p>
+        <p>Current Balance: £{ utils.FormatFloat(page.Budget.CurrentBalance) }</p>
+    </div>
+    <div class="stats">
+        <p>All Time Spent: £{ utils.FormatFloat(page.Budget.AllTimeSpent) }</p>
+        <p>All Time Saved: £{ utils.FormatFloat(page.Budget.AllTimeSaved) }</p>
+    </div>
+    @footer()
+</div>
+}

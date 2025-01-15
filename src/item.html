@@ -1,4 +1,5 @@
-{{ define "item" }}
+{{define "item"}}
+
 <style>
     .item {
         display: flex;
@@ -44,41 +45,55 @@
         height: 100%;
         display: none;
         z-index: 100;
+        flex-direction: row;
     }
 
     .item-options>button {
+        font-size: 1.5rem;
         background: #FFFFFF;
         border: none;
         color: red;
+        height: 1.5rem;
+        overflow: hidden;
+    }
+
+    .item-options-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 </style>
 <div class="item-wrap" id="items">
-    {{ range .Items }}
+    {{range .Items}}
     <div class="item" data-id="{{.ID}}" onclick="toggleOptions('{{.ID}}')">
-        <h3>{{ .Name }}</h3>
+        <h3>{{.Name}}</h3>
         <div class="percentage-line" data-price="{{.Price}}" data-saved="{{.Saved}}">
             <div class="percentage-fill"></div>
         </div>
 
         <div class="price">
-            <p>£{{ formatFloat .Saved }}</p>
-            <p>{{ formatRecurring .Recurring }}</p>
-            <p>£{{ formatFloat .Price }}</p>
+            <p>£{{formatFloat .Saved}}</p>
+            <p>{{formatRecurring .Recurring}}</p>
+            <p>£{{formatFloat .Price}}</p>
         </div>
 
         <div class="item-options" id="options{{.ID}}">
-            <button onclick="toggleOptions('{{.ID}}')">X</button>
+            <button onclick="toggleOptions('{{.ID}}')" style="border: 1px solid red;">X</button>
 
-            <form>
-                <input type="text" name="name" value="{{.Name}}" />
-            </form>
 
-            <form name="updateAllocate{{.ID}}">
-                <input type="text" id="newAllocate{{.ID}}" placeholder="Enter Ammount: " />
-            </form>
+            <div class="item-options-form">
+                <form>
+                    <input type="text" name="name" value="{{.Name}}" />
+                </form>
+
+                <form name="updateAllocate{{.ID}}">
+                    <input type="text" id="newAllocate{{.ID}}" placeholder="Enter Ammount: " />
+                </form>
+            </div>
         </div>
     </div>
-    {{ end }}
+    {{end}}
 
     <script>
         /**
@@ -87,11 +102,12 @@
         function toggleOptions(id) {
             const options = document.getElementById(`options${id}`);
             if (window.getComputedStyle(options).display == "none") {
-                options.style.display = "block"
+                options.style.display = "flex"
             } else {
                 options.style.display = "none"
             }
         }
     </script>
 </div>
+
 {{end}}
