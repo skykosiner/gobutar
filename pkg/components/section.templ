@@ -14,8 +14,8 @@ css sectionWrap() {
 }
 
 css editSection() {
-	z-index: 99;
 	display: none;
+	z-index: 99;
 	background-color: #F1F1F1;
 	position: fixed;
 	overflow: hidden;
@@ -42,6 +42,15 @@ css sectionHeaderButton() {
 	transition: 0.3s ease all;
 }
 
+script toggleOptions(id int) {
+const options = document.getElementById(id)
+if (window.getComputedStyle(options).display == "none") {
+options.style.display = "block"
+} else {
+options.style.display = "none"
+}
+}
+
 templ section(sections []sections.Section) {
 	<div class={ sectionWrap() } id="section">
 		for _, section := range sections {
@@ -49,10 +58,10 @@ templ section(sections []sections.Section) {
 				<div>
 					<div class={ sectionHeader(section.Color) }>
 						<h2>{ section.Name }</h2>
-						<button class={ sectionHeaderButton() }>Edit</button>
+						<button onclick={ toggleOptions(section.ID) } class={ sectionHeaderButton() }>Edit</button>
 					</div>
 				</div>
-				<div class={ editSection() }>
+				<div class={ editSection() } id={ strconv.Itoa(section.ID) }>
 					<form>
 						<input type="text" name="newName" value={ section.Name }/>
 					</form>
