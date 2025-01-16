@@ -129,7 +129,7 @@ func Home(page Page) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script type=\"text/javascript\">\n        const percentageLines = document.querySelectorAll(\"#percentage-line\");\n        percentageLines.forEach(line => {\n            const price = parseFloat(line.getAttribute(\"data-price\"));\n            const saved = parseFloat(line.getAttribute(\"data-saved\"));\n\n            const savedPercentage = price > 0 ? (saved / price) * 100 : 0;\n            const fillElement = line.querySelector(\"#percentage-fill\");\n\n            //@ts-ignore\n            fillElement.style.width = `${savedPercentage}%`;\n        });\n    </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,68 +1,6 @@
 {{define "item"}}
 
 <style>
-    .item {
-        display: flex;
-        flex-direction: column;
-        padding: 0.5rem;
-        background-color: #F1F1F1;
-        border-radius: 5px;
-        width: 97%;
-        margin-top: 0.9rem;
-    }
-
-    .item>p {
-        padding-left: 0.5rem;
-    }
-
-    .percentage-line {
-        width: 100%;
-        height: 0.937rem;
-        background: #f1f1f1;
-        position: relative;
-        margin: 10px 0;
-        overflow: hidden;
-    }
-
-    .percentage-fill {
-        height: 100%;
-        background: #20E5A4;
-        width: 0;
-        transition: width 0.3s ease;
-    }
-
-    .price {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .item-options {
-        background-color: #FFFFFF;
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 70%;
-        height: 100%;
-        display: none;
-        z-index: 100;
-        flex-direction: row;
-    }
-
-    .item-options>button {
-        font-size: 1.5rem;
-        background: #FFFFFF;
-        border: none;
-        color: red;
-        height: 1.5rem;
-        overflow: hidden;
-    }
-
-    .item-options-form {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
 </style>
 <div class="item-wrap" id="items">
     {{range .Items}}

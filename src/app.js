@@ -61,16 +61,16 @@ sections.map(section => {
     });
 })
 
-const percentageLines = document.querySelectorAll(".percentage-line");
-percentageLines.forEach(line => {
-    const price = parseFloat(line.getAttribute("data-price"));
-    const saved = parseFloat(line.getAttribute("data-saved"));
-
-    const savedPercentage = price > 0 ? (saved / price) * 100 : 0;
-    const fillElement = line.querySelector(".percentage-fill");
-    //@ts-ignore
-    fillElement.style.width = `${savedPercentage}%`;
-});
+// const percentageLines = document.querySelectorAll(".percentage-line");
+// percentageLines.forEach(line => {
+//     const price = parseFloat(line.getAttribute("data-price"));
+//     const saved = parseFloat(line.getAttribute("data-saved"));
+//
+//     const savedPercentage = price > 0 ? (saved / price) * 100 : 0;
+//     const fillElement = line.querySelector(".percentage-fill");
+//     //@ts-ignore
+//     fillElement.style.width = `${savedPercentage}%`;
+// });
 
 const itemContainer = document.querySelectorAll("#items");
 itemContainer.forEach(item => {
