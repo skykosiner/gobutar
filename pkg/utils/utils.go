@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 
@@ -17,4 +18,10 @@ func FormatRecurring(recurring items.Recurring) string {
 	}
 
 	return "One Time"
+}
+
+func SortItems(items []items.Item) {
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Name < items[j].Name
+	})
 }
