@@ -1,0 +1,66 @@
+package components
+
+import (
+	"fmt"
+	"github.com/skykosiner/gobutar/pkg/items"
+	"github.com/skykosiner/gobutar/pkg/utils"
+)
+
+templ item(item items.Item) {
+	<script type="text/javascript">
+    const percentageLines = document.querySelectorAll(".percentage-line");
+    percentageLines.forEach(line => {
+        const price = parseFloat(line.getAttribute("data-price"));
+        const saved = parseFloat(line.getAttribute("data-saved"));
+
+        const savedPercentage = price > 0 ? (saved / price) * 100 : 0;
+        const fillElement = line.querySelector(".percentage-fill");
+
+        //@ts-ignore
+        fillElement.style.width = `${savedPercentage}%`;
+    });
+</script>
+	<style>
+    .percentage-line {
+        width: 100%;
+        height: 0.937rem;
+        background: #f1f1f1;
+        position: relative;
+        margin: 10px 0;
+        overflow: hidden;
+    }
+
+    .percentage-fill {
+        height: 100%;
+        background: #20E5A4;
+        width: 0;
+        transition: width 0.3s ease;
+    }
+</style>
+	<div class="item">
+		<h3>{ item.Name }</h3>
+		<div
+			class="percentage-line"
+			data-price={ fmt.Sprintf("%f", item.Price) }
+			data-saved={ fmt.Sprintf("%f", item.Saved) }
+		>
+			<div class="percentage-fill"></div>
+		</div>
+		<div class="price">
+			<p>£{ utils.FormatFloat(item.Saved) }</p>
+			<p>{ utils.FormatRecurring(item.Recurring) }</p>
+			<p>£{ utils.FormatFloat(item.Price) }</p>
+		</div>
+		<div class="item-options">
+			<button style="border: 1px solid red;">X</button>
+			<div class="item-options-form">
+				<form>
+					<input type="text" name="name" value={ item.Name }/>
+				</form>
+				<form>
+					<input type="text" placeholder="Enter Ammount: "/>
+				</form>
+			</div>
+		</div>
+	</div>
+}
