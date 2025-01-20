@@ -66,8 +66,17 @@ css itemOptionsForm() {
 	align-items: center;
 }
 
+script toggleItemOptions(id string) {
+const options = document.getElementById(id)
+if (window.getComputedStyle(options).display == "none") {
+options.style.display = "flex"
+} else {
+options.style.display = "none"
+}
+}
+
 templ item(item items.Item) {
-	<div class={ itemWrap() }>
+	<div class={ itemWrap() } onclick={ toggleItemOptions(item.ID) }>
 		<h3>{ item.Name }</h3>
 		<div
 			class={ percentageLine() }
@@ -83,7 +92,7 @@ templ item(item items.Item) {
 			<p>{ utils.FormatRecurring(item.Recurring) }</p>
 			<p>£{ utils.FormatFloat(item.Price) }</p>
 		</div>
-		<div class={ itemOptions() }>
+		<div class={ itemOptions() } id={ item.ID }>
 			<button class={ itemOptionsButton() }>X</button>
 			<div class={ itemOptionsForm() }>
 				<form>
