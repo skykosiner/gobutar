@@ -3,8 +3,11 @@ package sections
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 
+	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/items"
+	"github.com/skykosiner/gobutar/pkg/templates"
 )
 
 type Section struct {
@@ -100,4 +103,75 @@ func EditSectionName(db *sql.DB, sectionID int, name string) error {
 func EditSectionColor(db *sql.DB, sectionID, color string) error {
 	_, err := db.Exec(fmt.Sprintf("UPDATE sections SET color = '%s' WHERE id = %s", color, sectionID))
 	return err
+}
+
+func SendNewItemForm(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var newFormInfo struct {
+			Unallocated float64
+			ItemsInfo   []struct {
+				Name      string
+				ID        string
+				Allocated float64
+			}
+			SectionInfo []struct {
+				Name string
+				ID   int
+			}
+		}
+
+		s, err := GetSections(db)
+		if err != nil {
+			http.Error(w, "Error getting your sections.", http.StatusInternalServerError)
+			return
+		}
+
+		for _, section := range s {
+			newFormInfo.SectionInfo = append(newFormInfo.SectionInfo, struct {
+				Name string
+				ID   int
+			}{
+				section.Name,
+				section.ID,
+			})
+		}
+
+		b, err := budget.NewBudget(db)
+		if err != nil {
+			http.Error(w, "Error getting your budget.", http.StatusInternalServerError)
+			return
+		}
+
+		newFormInfo.Unallocated = b.Unallocated
+
+		rows, err := db.Query("SELECT name, id, saved FROM items WHERE saved > 0.0")
+		if err != nil {
+			http.Error(w, "Error getting item info.", http.StatusInternalServerError)
+			return
+		}
+
+		defer rows.Close()
+
+		for rows.Next() {
+			var name, id string
+			var allocated float64
+
+			if err := rows.Scan(&name, &id, &allocated); err != nil {
+				http.Error(w, "Error getting item info.", http.StatusInternalServerError)
+				return
+			}
+
+			newFormInfo.ItemsInfo = append(newFormInfo.ItemsInfo, struct {
+				Name      string
+				ID        string
+				Allocated float64
+			}{
+				name,
+				id,
+				allocated,
+			})
+		}
+
+		templates.RenderTemplate(w, "new-item", newFormInfo)
+	}
 }

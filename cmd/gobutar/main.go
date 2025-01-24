@@ -1,4 +1,5 @@
 package main
+// TODO: Add in logging with a verbose option
 
 import (
 	"database/sql"
@@ -8,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"text/template"
 
 	"github.com/a-h/templ"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,23 +16,8 @@ import (
 	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
-	"github.com/skykosiner/gobutar/pkg/utils"
+	"github.com/skykosiner/gobutar/pkg/templates"
 )
-
-var (
-	templates = template.Must(template.New("base").Funcs(template.FuncMap{
-		"formatFloat":     utils.FormatFloat,
-		"formatRecurring": utils.FormatRecurring,
-	}).ParseGlob("src/*.html"))
-)
-
-func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
-	w.Header().Set("Content-Type", "text/html")
-	if err := templates.ExecuteTemplate(w, tmpl, data); err != nil {
-		slog.Error("Error rendering template", "error", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 func main() {
 	db, err := sql.Open("sqlite3", "./gobutar.db")
@@ -94,7 +79,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", components.Page{
+		templates.RenderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -141,7 +126,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", components.Page{
+		templates.RenderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -180,7 +165,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", components.Page{
+		templates.RenderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -220,7 +205,7 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", components.Page{
+		templates.RenderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
@@ -265,35 +250,13 @@ func main() {
 			return
 		}
 
-		renderTemplate(w, "index", components.Page{
+		templates.RenderTemplate(w, "index", components.Page{
 			Budget:   budget,
 			Sections: sectionsSlice,
 		})
 	})
 
-	http.HandleFunc("/api/get-form-new-item", func(w http.ResponseWriter, r *http.Request) {
-		var sectionInfo []struct {
-			Name string
-			ID   int
-		}
-		s, err := sections.GetSections(db)
-		if err != nil {
-			http.Error(w, "Error getting your sections.", http.StatusInternalServerError)
-			return
-		}
-
-		for _, section := range s {
-			sectionInfo = append(sectionInfo, struct {
-				Name string
-				ID   int
-			}{
-				section.Name,
-				section.ID,
-			})
-		}
-
-		renderTemplate(w, "new-item", sectionInfo)
-	})
+	http.Handle("/api/get-form-new-item", sections.SendNewItemForm(db))
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
 

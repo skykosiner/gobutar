@@ -14,13 +14,33 @@
     .new-item>select {
         margin: 0.2rem;
     }
+
+    .saved {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .saved>input {
+        width: 90%;
+    }
 </style>
 
 <div style="display: flex; align-items: center; justify-content: center;">
     <form hx-post="/api/item/new" hx-swap="innerHTML" class="new-item" id="new-item" hx-ext="json-enc">
         <input type="text" name="name" placeholder="Name: " />
         <input type="number" name="price" placeholder="Price: " />
-        <input type="number" name="saved" placeholder="Saved: " />
+
+
+        <!-- TODO: add in correct support for floats -->
+        <label for="saved">Allocated:</label>
+        <div class="saved" id="saved">
+            <p>0</p>
+            <input type="range" min="0" max="{{.Unallocated}}" value="0" id="slider" />
+            <p>{{formatFloat .Unallocated}}</p>
+        </div>
+
+        <input type="number" disabled id="value" value="0"/>
 
         <select name="recurring">
             <option value="no">No</option>
@@ -31,7 +51,7 @@
         </select>
 
         <select name="section_id">
-            {{range .}}
+            {{range .SectionInfo}}
             <option value="{{.ID}}">{{.Name}}</option>
             {{end}}
         </select>
@@ -46,6 +66,10 @@
         const form = document.getElementById("new-item");
         form.innerHTML = "";
         form.reset();
+    });
+
+    document.getElementById("slider").addEventListener("input", function () {
+        document.getElementById("value").value = this.value;
     });
 </script>
 

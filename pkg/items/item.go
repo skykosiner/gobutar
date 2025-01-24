@@ -42,6 +42,7 @@ func (i Item) String() string {
 	return fmt.Sprintf("ID: %s\nName: %s\nPrice: %f\nRecuring: %s, SectionID: %d", i.ID, i.Name, i.Price, i.Recurring, i.SectionID)
 }
 
+
 func ParseRecurring(value string) (Recurring, error) {
 	switch value {
 	case string(No), string(Monthly), string(Weekly), string(Yearly), string(Daily):
