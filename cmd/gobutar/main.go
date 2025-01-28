@@ -1,4 +1,5 @@
 package main
+
 // TODO: Add in logging with a verbose option
 
 import (
@@ -16,6 +17,7 @@ import (
 	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
+	"github.com/skykosiner/gobutar/pkg/spent"
 	"github.com/skykosiner/gobutar/pkg/templates"
 )
 
@@ -271,11 +273,23 @@ func main() {
 		slog.Error("Error getting budget", "error", err)
 		return
 	}
-	component := components.Home(components.Page{
+
+	home := components.Home(components.Page{
 		Budget:   budget,
 		Sections: sectionsSlice,
 	})
-	http.Handle("/test", templ.Handler(component))
+
+	http.Handle("/test", templ.Handler(home))
+	http.HandleFunc("/spent", func(w http.ResponseWriter, r *http.Request) {
+		spent, err := spent.GetSpentItems(db)
+		if err != nil {
+			slog.Error("Error getting spent items.", "error", err, "spent", spent)
+			return
+		}
+
+		spentComponent := components.Spent(spent)
+		spentComponent.Render(r.Context(), w)
+	})
 
 	if err := http.ListenAndServe(":42069", nil); err != nil {
 		slog.Error("Error starting webserver", "error", err)

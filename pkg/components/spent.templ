@@ -1,0 +1,9 @@
+package components
+
+import "github.com/skykosiner/gobutar/pkg/spent"
+
+templ Spent(spent []spent.Spent) {
+    for _, s := range spent {
+        <h1>{s.ItemName}</h1>
+    }
+}
