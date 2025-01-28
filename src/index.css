@@ -38,3 +38,25 @@ a:hover {
     display: flex;
     justify-content: space-between;
 }
+
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+th {
+    padding: 0.2rem;
+    background-color: #20E5A4;
+    font-size: 1.5rem;
+}
+
+th, td {
+  border-right: 1px solid black;
+  padding: 10px;
+}
+
+th:last-child, td:last-child {
+  border-right: none;
+}

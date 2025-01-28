@@ -1,9 +1,85 @@
 package components
 
-import "github.com/skykosiner/gobutar/pkg/spent"
+import (
+	"github.com/skykosiner/gobutar/pkg/spent"
+	"github.com/skykosiner/gobutar/pkg/utils"
+)
+
+css Table() {
+	border-collapse: collapse;
+	margin: 25px 0;
+	width: 95%;
+}
 
 templ Spent(spent []spent.Spent) {
-    for _, s := range spent {
-        <h1>{s.ItemName}</h1>
-    }
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<link rel="stylesheet" href="/src/index.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+			<title>Gobutar</title>
+		</head>
+		<body>
+			<style>
+        th {
+            padding: 0.2rem;
+            background-color: #20E5A4;
+            font-size: 1.5rem;
+        }
+
+        th,
+        td {
+            border-right: 1px solid black;
+            padding: 10px;
+        }
+
+        th:last-child,
+        td:last-child {
+            border-right: none;
+        }
+
+        thead {
+            text-align: left;
+            padding-bottom: 0.5rem;
+        }
+
+        .row {
+            cursor: pointer;
+            transition: 0.3s ease all;
+        }
+
+        .row:hover {
+            color: #111111;
+            transform: scale(1.1);
+        }
+    </style>
+			@navbar()
+			<div class="center">
+				<table class={ Table() }>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Price</th>
+							<th>Recurring</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, s := range spent {
+							<tr class="row">
+								<td>{ s.ItemName }</td>
+								<td>{ utils.FormatFloat(s.ItemPrice) }</td>
+								<td>{ utils.FormatRecurring(s.ItemRecurring) }</td>
+								<td>{ s.PurchaseDate }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			@footer()
+		</body>
+	</html>
 }
