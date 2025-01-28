@@ -17,8 +17,8 @@ import (
 	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
-	"github.com/skykosiner/gobutar/pkg/spent"
 	"github.com/skykosiner/gobutar/pkg/templates"
+	"github.com/skykosiner/gobutar/pkg/transactions"
 )
 
 func main() {
@@ -49,9 +49,12 @@ func main() {
 		all_time_saved REAL NOT NULL DEFAULT 0.00
 	);
 
-	CREATE TABLE IF NOT EXISTS spent (
+	CREATE TABLE IF NOT EXISTS transactions (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		purchase_date TEXT NOT NULL,
+		payee TEXT NOT NULL,
+		outflow REAL NOT NULL,
+		inflow REAL NOT NULL,
 		item_id TEXT NOT NULL,
 		FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
 	);
@@ -213,6 +216,8 @@ func main() {
 		})
 	})
 
+	http.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
+
 	http.HandleFunc("/api/item/new", func(w http.ResponseWriter, r *http.Request) {
 		var newItem struct {
 			Name      string          `json:"name"`
@@ -280,14 +285,14 @@ func main() {
 	})
 
 	http.Handle("/test", templ.Handler(home))
-	http.HandleFunc("/spent", func(w http.ResponseWriter, r *http.Request) {
-		spent, err := spent.GetSpentItems(db)
+	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+		t, err := transactions.GetTransactions(db)
 		if err != nil {
-			slog.Error("Error getting spent items.", "error", err, "spent", spent)
+			slog.Error("Error getting spent items.", "error", err, "spent", t)
 			return
 		}
 
-		spentComponent := components.Spent(spent)
+		spentComponent := components.Transactions(t)
 		spentComponent.Render(r.Context(), w)
 	})
 

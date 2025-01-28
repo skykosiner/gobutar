@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/skykosiner/gobutar/pkg/spent"
+	"github.com/skykosiner/gobutar/pkg/transactions"
 	"github.com/skykosiner/gobutar/pkg/utils"
 )
 
@@ -11,7 +11,15 @@ css Table() {
 	width: 95%;
 }
 
-templ Spent(spent []spent.Spent) {
+css header() {
+	padding-top: 0.5rem;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 95%;
+}
+
+templ Transactions(ts []transactions.Transaction) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -58,22 +66,39 @@ templ Spent(spent []spent.Spent) {
     </style>
 			@navbar()
 			<div class="center">
+				<div class={ header() }>
+					<button>New Transaction</button>
+					<form hx-post="/api/transaction/new" hx-swap="innerHTML" class="new-item" id="new-item" hx-ext="json-enc">
+                        <input name="payee" type="text" placeholder="Payee" />
+                        <input name="purchase_date" type="date" />
+                        <input name="item_id" type="text" placeholder="Item id" />
+                        <input name="outflow" type="number" placeholder="Outflow" />
+                        <input name="inflow" type="number" placeholder="inflow" />
+                        <input type="submit" />
+                    </form>
+
+					<form>
+						<input name="out" type="text" placeholder="Search"/>
+					</form>
+				</div>
 				<table class={ Table() }>
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Price</th>
-							<th>Recurring</th>
 							<th>Date</th>
+							<th>Payee</th>
+							<th>Outflow</th>
+							<th>Inflow</th>
 						</tr>
 					</thead>
 					<tbody>
-						for _, s := range spent {
+						for _, s := range ts {
 							<tr class="row">
 								<td>{ s.ItemName }</td>
-								<td>{ utils.FormatFloat(s.ItemPrice) }</td>
-								<td>{ utils.FormatRecurring(s.ItemRecurring) }</td>
 								<td>{ s.PurchaseDate }</td>
+								<td>{ s.Payee }</td>
+								<td>{ utils.FormatFloat(s.Outflow) }</td>
+								<td>{ utils.FormatFloat(s.Inflow) }</td>
 							</tr>
 						}
 					</tbody>
