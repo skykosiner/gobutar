@@ -44,7 +44,7 @@ func GetTransactions(db *sql.DB) ([]Transaction, error) {
 
 	for rows.Next() {
 		var transaction Transaction
-		if err := rows.Scan(&transaction.ID, &transaction.PurchaseDate, &transaction.Payee, &transaction.Outflow, &transaction.Inflow,&transaction.ItemID, &transaction.ItemName); err != nil {
+		if err := rows.Scan(&transaction.ID, &transaction.PurchaseDate, &transaction.Payee, &transaction.Outflow, &transaction.Inflow, &transaction.ItemID, &transaction.ItemName); err != nil {
 			return transactions, err
 		}
 

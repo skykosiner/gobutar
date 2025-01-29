@@ -3,6 +3,7 @@ package components
 import (
 	"github.com/skykosiner/gobutar/pkg/transactions"
 	"github.com/skykosiner/gobutar/pkg/utils"
+	"strconv"
 )
 
 css Table() {
@@ -59,24 +60,24 @@ templ Transactions(ts []transactions.Transaction) {
             transition: 0.3s ease all;
         }
 
-        .row:hover {
-            color: #111111;
-            transform: scale(1.1);
+        .options {
+            opacity: 0;
+            transition: 0.3s ease all;
         }
+
     </style>
 			@navbar()
 			<div class="center">
 				<div class={ header() }>
 					<button>New Transaction</button>
 					<form hx-post="/api/transaction/new" hx-swap="innerHTML" class="new-item" id="new-item" hx-ext="json-enc">
-                        <input name="payee" type="text" placeholder="Payee" />
-                        <input name="purchase_date" type="date" />
-                        <input name="item_id" type="text" placeholder="Item id" />
-                        <input name="outflow" type="number" placeholder="Outflow" />
-                        <input name="inflow" type="number" placeholder="inflow" />
-                        <input type="submit" />
-                    </form>
-
+						<input name="payee" type="text" placeholder="Payee"/>
+						<input name="purchase_date" type="date"/>
+						<input name="item_id" type="text" placeholder="Item id"/>
+						<input name="outflow" type="number" placeholder="Outflow"/>
+						<input name="inflow" type="number" placeholder="inflow"/>
+						<input type="submit"/>
+					</form>
 					<form>
 						<input name="out" type="text" placeholder="Search"/>
 					</form>
@@ -84,6 +85,7 @@ templ Transactions(ts []transactions.Transaction) {
 				<table class={ Table() }>
 					<thead>
 						<tr>
+							<th></th>
 							<th>Name</th>
 							<th>Date</th>
 							<th>Payee</th>
@@ -94,6 +96,7 @@ templ Transactions(ts []transactions.Transaction) {
 					<tbody>
 						for _, s := range ts {
 							<tr class="row">
+								<td><input id="check" type="checkbox" data-id={ strconv.Itoa(s.ID) }/></td>
 								<td>{ s.ItemName }</td>
 								<td>{ s.PurchaseDate }</td>
 								<td>{ s.Payee }</td>
@@ -103,8 +106,14 @@ templ Transactions(ts []transactions.Transaction) {
 						}
 					</tbody>
 				</table>
+				for _, s := range ts {
+					<div id={ strconv.Itoa(s.ID) } class="options">
+						<button>Delete</button>
+					</div>
+				}
 			</div>
 			@footer()
+			<script stype="module" src="/src/app.js"></script>
 		</body>
 	</html>
 }

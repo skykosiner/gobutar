@@ -71,25 +71,6 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		sectionsSlice, err := sections.GetSections(db)
-		if err != nil {
-			slog.Error("Error getting sections", "error", err)
-			return
-		}
-
-		budget, err := budget.NewBudget(db)
-		if err != nil {
-			slog.Error("Error getting budget", "error", err)
-			return
-		}
-
-		templates.RenderTemplate(w, "index", components.Page{
-			Budget:   budget,
-			Sections: sectionsSlice,
-		})
-	})
-
 	http.HandleFunc("/api/section/new-name", func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(10 << 20); err != nil {
 			http.Error(w, "Unable to parse form", http.StatusInternalServerError)
@@ -284,7 +265,7 @@ func main() {
 		Sections: sectionsSlice,
 	})
 
-	http.Handle("/test", templ.Handler(home))
+	http.Handle("/", templ.Handler(home))
 	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		t, err := transactions.GetTransactions(db)
 		if err != nil {
