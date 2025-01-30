@@ -4,12 +4,9 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/a-h/templ"
 	_ "github.com/mattn/go-sqlite3"
@@ -17,7 +14,6 @@ import (
 	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/sections"
-	"github.com/skykosiner/gobutar/pkg/templates"
 	"github.com/skykosiner/gobutar/pkg/transactions"
 )
 
@@ -62,11 +58,12 @@ func main() {
 	CREATE TABLE IF NOT EXISTS sections (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL,
+		color TEXT NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS payees (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT NOT NULL,
+		name TEXT NOT NULL
 	);
 	`)
 
@@ -75,179 +72,13 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/api/section/new-name", func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseMultipartForm(10 << 20); err != nil {
-			http.Error(w, "Unable to parse form", http.StatusInternalServerError)
-			return
-		}
+	http.HandleFunc("/api/item/allocate", items.AllocateItemRoute(db))
+	http.HandleFunc("/api/item/new", items.NewItemRoute(db))
 
-		id := r.URL.Query().Get("id")
-		if id == "" {
-			http.Error(w, "Please provide an ID.", http.StatusBadRequest)
-			return
-		}
-
-		idInt, err := strconv.Atoi(id)
-		if err != nil {
-			http.Error(w, "Please provide a valid ID.", http.StatusBadRequest)
-			return
-		}
-
-		newName := r.FormValue("newName")
-		if len(newName) == 0 {
-			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
-			return
-		}
-
-		if err := sections.EditSectionName(db, idInt, newName); err != nil {
-			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
-			return
-		}
-
-		sectionsSlice, err := sections.GetSections(db)
-		if err != nil {
-			slog.Error("Error getting sections", "error", err)
-			return
-		}
-
-		budget, err := budget.NewBudget(db)
-		if err != nil {
-			slog.Error("Error getting budget", "error", err)
-			return
-		}
-
-		templates.RenderTemplate(w, "index", components.Page{
-			Budget:   budget,
-			Sections: sectionsSlice,
-		})
-		w.WriteHeader(http.StatusOK)
-	})
-
-	http.HandleFunc("/api/section/new-color", func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Query().Get("id")
-		if id == "" {
-			http.Error(w, "Please provide an ID.", http.StatusBadRequest)
-			return
-		}
-
-		var newColor struct {
-			NewColor string `json:"newColor"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&newColor); err != nil {
-			slog.Error("Error getting body of new color", "error", err)
-			return
-		}
-
-		if err := sections.EditSectionColor(db, id, newColor.NewColor); err != nil {
-			http.Error(w, "Please provide a new name.", http.StatusBadRequest)
-			return
-		}
-
-		sectionsSlice, err := sections.GetSections(db)
-		if err != nil {
-			slog.Error("Error getting sections", "error", err)
-			return
-		}
-
-		budget, err := budget.NewBudget(db)
-		if err != nil {
-			slog.Error("Error getting budget", "error", err)
-			return
-		}
-
-		templates.RenderTemplate(w, "index", components.Page{
-			Budget:   budget,
-			Sections: sectionsSlice,
-		})
-		w.WriteHeader(http.StatusOK)
-	})
-
-	http.HandleFunc("/api/item/allocate", func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Query().Get("id")
-		if id == "" {
-			http.Error(w, "Please provide an ID.", http.StatusBadRequest)
-			return
-		}
-
-		var ammountToAllocate struct {
-			AmmountToAllocate float64 `json:"ammountToAllocate"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&ammountToAllocate); err != nil {
-			slog.Error("Error getting body of ammount to alocate.", "error", err)
-			return
-		}
-
-		if err := items.AllocateMoneyForItem(id, ammountToAllocate.AmmountToAllocate, db); err != nil {
-			slog.Error("Seems to be an error", "error", err)
-			http.Error(w, "Sorry there was a problem", http.StatusBadRequest)
-			return
-		}
-
-		sectionsSlice, err := sections.GetSections(db)
-		if err != nil {
-			slog.Error("Error getting sections", "error", err)
-			return
-		}
-
-		budget, err := budget.NewBudget(db)
-		if err != nil {
-			slog.Error("Error getting budget", "error", err)
-			return
-		}
-
-		templates.RenderTemplate(w, "index", components.Page{
-			Budget:   budget,
-			Sections: sectionsSlice,
-		})
-	})
+	http.HandleFunc("/api/section/new-color", sections.SectionNewColor(db))
 
 	http.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
 	http.HandleFunc("/api/transaction/delete", transactions.DeleteTransaction(db))
-
-	http.HandleFunc("/api/item/new", func(w http.ResponseWriter, r *http.Request) {
-		var newItem struct {
-			Name      string          `json:"name"`
-			Price     string          `json:"price"`
-			Saved     string          `json:"saved"`
-			Recurring items.Recurring `json:"recurring"`
-			SectionID string          `json:"section_id"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&newItem); err != nil {
-			slog.Error("Error getting body of ammount to alocate.", "error", err)
-			return
-		}
-
-		fmt.Println(newItem)
-
-		price, _ := strconv.ParseFloat(newItem.Price, 64)
-		saved, _ := strconv.ParseFloat(newItem.Saved, 64)
-		sectionID, _ := strconv.Atoi(newItem.SectionID)
-
-		item := items.NewItem(newItem.Name, price, saved, newItem.Recurring, sectionID)
-		if err := items.SaveItem(db, item); err != nil {
-			slog.Error("Couldn't save new item", "error", err, "new item", item)
-			http.Error(w, "Sorry there was a problem", http.StatusBadRequest)
-			return
-		}
-
-		sectionsSlice, err := sections.GetSections(db)
-		if err != nil {
-			slog.Error("Error getting sections", "error", err)
-			return
-		}
-
-		budget, err := budget.NewBudget(db)
-		if err != nil {
-			slog.Error("Error getting budget", "error", err)
-			return
-		}
-
-		templates.RenderTemplate(w, "index", components.Page{
-			Budget:   budget,
-			Sections: sectionsSlice,
-		})
-	})
 
 	http.Handle("/api/get-form-new-item", sections.SendNewItemForm(db))
 
