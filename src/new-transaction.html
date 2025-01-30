@@ -1,17 +1,18 @@
 {{define "new-transaction"}}
 
-<form>
-    <select name="payee">
+<form hx-post="/api/transaction/new" hx-swap="innerHTML" id="new-transaction" hx-ext="json-enc">
+    <input list="payee" name="payee" />
+    <datalist id="payee">
         {{range .Payees}}
-        <option value="{{.Name}}">{{.Name}}</option>
+        <option value="{{.}}">{{.}}</option>
         {{end}}
-    </select>
+    </datalist>
 
-    <input name="purchase_date" type="date" />
-    <input name="item_id" type="text" placeholder="Item id" />
-    <input name="outflow" type="number" placeholder="Outflow" />
-    <input name="inflow" type="number" placeholder="inflow" />
-    <input type="submit" value="New Transaction" />
+        <input name="purchase_date" type="date" />
+        <input name="item_id" type="text" placeholder="Item id" />
+        <input name="outflow" type="number" placeholder="Outflow" />
+        <input name="inflow" type="number" placeholder="inflow" />
+        <input type="submit" value="New Transaction" />
 </form>
 
 {{end}}

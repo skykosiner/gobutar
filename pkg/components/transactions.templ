@@ -66,10 +66,6 @@ templ Transactions(ts []transactions.Transaction) {
             transition: 0.3s ease all;
         }
 
-        #new-transaction {
-            display: none;
-        }
-
         .new-transaction {
             cursor: pointer;
             border: none;
@@ -86,16 +82,8 @@ templ Transactions(ts []transactions.Transaction) {
 			@navbar()
 			<div class="center">
 				<div class={ header() }>
-					<button onclick="newTransaction();" class="new-transaction">New Transaction</button>
-					<form hx-post="/api/transaction/new" hx-swap="innerHTML" id="new-transaction" hx-ext="json-enc">
-						<input name="payee" type="text" placeholder="Payee"/>
-						<input name="purchase_date" type="date"/>
-						<input name="item_id" type="text" placeholder="Item id"/>
-						<input name="outflow" type="number" placeholder="Outflow"/>
-						<input name="inflow" type="number" placeholder="inflow"/>
-						<input type="submit"/>
-						<input type="button" value="Cancel" onclick="newTransaction();"/>
-					</form>
+					<button hx-get="/api/transaction/new-form" hx-target="#new-form-transaction" hx-swap="innerHTML" class="new-transaction">New Transaction</button>
+                    <div id="new-form-transaction"></div>
 					<form>
 						<input name="out" type="text" placeholder="Search"/>
 					</form>

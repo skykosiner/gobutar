@@ -79,6 +79,7 @@ func main() {
 
 	http.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
 	http.HandleFunc("/api/transaction/delete", transactions.DeleteTransaction(db))
+	http.HandleFunc("/api/transaction/new-form", transactions.SendNewTransactionForm(db))
 
 	http.Handle("/api/get-form-new-item", sections.SendNewItemForm(db))
 

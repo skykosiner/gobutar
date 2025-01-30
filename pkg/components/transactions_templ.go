@@ -62,7 +62,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/src/index.css\"><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><title>Gobutar</title></head><body><style>\n        th {\n            padding: 0.2rem;\n            background-color: #20E5A4;\n            font-size: 1.5rem;\n        }\n\n        th,\n        td {\n            border-right: 1px solid black;\n            padding: 10px;\n        }\n\n        th:last-child,\n        td:last-child {\n            border-right: none;\n        }\n\n        thead {\n            text-align: left;\n            padding-bottom: 0.5rem;\n        }\n\n        .row {\n            cursor: pointer;\n            transition: 0.3s ease all;\n        }\n\n        .options {\n            opacity: 0;\n            transition: 0.3s ease all;\n        }\n\n        #new-transaction {\n            display: none;\n        }\n\n        .new-transaction {\n            cursor: pointer;\n            border: none;\n            padding: 0.5rem;\n            font-size: 1.2rem;\n            background-color: #F1F1F1;\n            transition: 0.3s ease all;\n        }\n\n        .new-transaction:hover {\n            transform: scale(1.01);\n        }\n    </style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"stylesheet\" href=\"/src/index.css\"><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/json-enc.js\"></script><title>Gobutar</title></head><body><style>\n        th {\n            padding: 0.2rem;\n            background-color: #20E5A4;\n            font-size: 1.5rem;\n        }\n\n        th,\n        td {\n            border-right: 1px solid black;\n            padding: 10px;\n        }\n\n        th:last-child,\n        td:last-child {\n            border-right: none;\n        }\n\n        thead {\n            text-align: left;\n            padding-bottom: 0.5rem;\n        }\n\n        .row {\n            cursor: pointer;\n            transition: 0.3s ease all;\n        }\n\n        .options {\n            opacity: 0;\n            transition: 0.3s ease all;\n        }\n\n        .new-transaction {\n            cursor: pointer;\n            border: none;\n            padding: 0.5rem;\n            font-size: 1.2rem;\n            background-color: #F1F1F1;\n            transition: 0.3s ease all;\n        }\n\n        .new-transaction:hover {\n            transform: scale(1.01);\n        }\n    </style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,7 +92,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><button onclick=\"newTransaction();\" class=\"new-transaction\">New Transaction</button><form hx-post=\"/api/transaction/new\" hx-swap=\"innerHTML\" id=\"new-transaction\" hx-ext=\"json-enc\"><input name=\"payee\" type=\"text\" placeholder=\"Payee\"> <input name=\"purchase_date\" type=\"date\"> <input name=\"item_id\" type=\"text\" placeholder=\"Item id\"> <input name=\"outflow\" type=\"number\" placeholder=\"Outflow\"> <input name=\"inflow\" type=\"number\" placeholder=\"inflow\"> <input type=\"submit\"> <input type=\"button\" value=\"Cancel\" onclick=\"newTransaction();\"></form><form><input name=\"out\" type=\"text\" placeholder=\"Search\"></form></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><button hx-get=\"/api/transaction/new-form\" hx-target=\"#new-form-transaction\" hx-swap=\"innerHTML\" class=\"new-transaction\">New Transaction</button><div id=\"new-form-transaction\"></div><form><input name=\"out\" type=\"text\" placeholder=\"Search\"></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -126,7 +126,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 117, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 105, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -139,7 +139,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(s.ItemName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 118, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 106, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -152,7 +152,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(s.PurchaseDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 119, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 107, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -165,7 +165,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(s.Payee)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 120, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 108, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -178,7 +178,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatFloat(s.Outflow))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 121, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 109, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -191,7 +191,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatFloat(s.Inflow))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 122, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 110, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -214,7 +214,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 128, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 116, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -227,7 +227,7 @@ func Transactions(ts []transactions.Transaction) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/api/transaction/delete?id=%d", s.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 131, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/components/transactions.templ`, Line: 119, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {

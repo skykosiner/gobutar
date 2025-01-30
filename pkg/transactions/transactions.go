@@ -3,9 +3,13 @@ package transactions
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/skykosiner/gobutar/pkg/payee"
+	"github.com/skykosiner/gobutar/pkg/templates"
 )
 
 type Transaction struct {
@@ -69,12 +73,18 @@ func NewTransaction(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		if err := payee.ProcessPayee(db, newTransaction.Payee); err != nil {
+			slog.Error("Error processing payee info", "error", err, "new transaction", newTransaction)
+			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+			return
+		}
+
 		outflow, _ := strconv.ParseFloat(newTransaction.Outflow, 64)
 		inflow, _ := strconv.ParseFloat(newTransaction.Inflow, 64)
 
 		_, err := db.Exec("INSERT INTO transactions (payee, purchase_date, item_id, outflow, inflow) VALUES (?,?,?,?,?)", newTransaction.Payee, newTransaction.PurchaseDate, newTransaction.ItemID, outflow, inflow)
 		if err != nil {
-			slog.Warn("Error creating new transaction in db", "error", err, "new transaction", newTransaction)
+			slog.Error("Error creating new transaction in db", "error", err, "new transaction", newTransaction)
 			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 			return
 		}
@@ -99,5 +109,28 @@ func DeleteTransaction(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func SendNewTransactionForm(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var newTransaction struct {
+			Payees []string
+		}
+
+		payees, err := payee.GetPayees(db)
+		if err != nil {
+			slog.Error("Error getting payees", "error", err)
+			http.Error(w, "Sorry there was an error please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		for _, p := range payees {
+			newTransaction.Payees = append(newTransaction.Payees, p.Name)
+		}
+
+		fmt.Println(newTransaction)
+
+		templates.RenderTemplate(w, "new-transaction", newTransaction)
 	}
 }
