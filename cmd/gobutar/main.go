@@ -62,7 +62,11 @@ func main() {
 	CREATE TABLE IF NOT EXISTS sections (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT NOT NULL,
-		color TEXT NOT NULL
+	);
+
+	CREATE TABLE IF NOT EXISTS payees (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
 	);
 	`)
 
@@ -198,6 +202,7 @@ func main() {
 	})
 
 	http.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
+	http.HandleFunc("/api/transaction/delete", transactions.DeleteTransaction(db))
 
 	http.HandleFunc("/api/item/new", func(w http.ResponseWriter, r *http.Request) {
 		var newItem struct {

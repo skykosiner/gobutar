@@ -1,12 +1,13 @@
 package components
 
 import (
+	"fmt"
 	"github.com/skykosiner/gobutar/pkg/transactions"
 	"github.com/skykosiner/gobutar/pkg/utils"
 	"strconv"
 )
 
-css Table() {
+css table() {
 	border-collapse: collapse;
 	margin: 25px 0;
 	width: 95%;
@@ -65,24 +66,41 @@ templ Transactions(ts []transactions.Transaction) {
             transition: 0.3s ease all;
         }
 
+        #new-transaction {
+            display: none;
+        }
+
+        .new-transaction {
+            cursor: pointer;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            background-color: #F1F1F1;
+            transition: 0.3s ease all;
+        }
+
+        .new-transaction:hover {
+            transform: scale(1.01);
+        }
     </style>
 			@navbar()
 			<div class="center">
 				<div class={ header() }>
-					<button>New Transaction</button>
-					<form hx-post="/api/transaction/new" hx-swap="innerHTML" class="new-item" id="new-item" hx-ext="json-enc">
+					<button onclick="newTransaction();" class="new-transaction">New Transaction</button>
+					<form hx-post="/api/transaction/new" hx-swap="innerHTML" id="new-transaction" hx-ext="json-enc">
 						<input name="payee" type="text" placeholder="Payee"/>
 						<input name="purchase_date" type="date"/>
 						<input name="item_id" type="text" placeholder="Item id"/>
 						<input name="outflow" type="number" placeholder="Outflow"/>
 						<input name="inflow" type="number" placeholder="inflow"/>
 						<input type="submit"/>
+						<input type="button" value="Cancel" onclick="newTransaction();"/>
 					</form>
 					<form>
 						<input name="out" type="text" placeholder="Search"/>
 					</form>
 				</div>
-				<table class={ Table() }>
+				<table class={ table() }>
 					<thead>
 						<tr>
 							<th></th>
@@ -108,7 +126,13 @@ templ Transactions(ts []transactions.Transaction) {
 				</table>
 				for _, s := range ts {
 					<div id={ strconv.Itoa(s.ID) } class="options">
-						<button>Delete</button>
+						<!-- TODO: make items reload after deleting an item -->
+						<button
+							hx-post={ fmt.Sprintf("/api/transaction/delete?id=%d", s.ID) }
+							hx-trigger="click"
+							hx-target="#delete-result"
+						>Delete</button>
+						<div id="delete-result"></div>
 					</div>
 				}
 			</div>

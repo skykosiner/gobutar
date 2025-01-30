@@ -78,5 +78,26 @@ func NewTransaction(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 			return
 		}
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func DeleteTransaction(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+		if len(id) == 0 {
+			http.Error(w, "Please provide an id of the transaction to delete.", http.StatusBadRequest)
+			return
+		}
+
+		_, err := db.Exec("DELETE FROM transactions WHERE id = ?", id)
+		if err != nil {
+			slog.Error("Depleting transaction.", "error", err, "transaction id", id)
+			http.Error(w, "Error deleting that transaction please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }

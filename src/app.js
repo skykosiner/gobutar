@@ -5,3 +5,12 @@ document.querySelectorAll("#check").forEach(checkbox => {
         document.getElementById(id).style.opacity = this.checked ? "1" : "0";
     });
 });
+
+function newTransaction() {
+    const newTransactionForm = document.getElementById("new-transaction")
+    if (window.getComputedStyle(newTransactionForm,null).getPropertyValue("display") === "none") {
+        newTransactionForm.style.display = "block"
+    } else {
+        newTransactionForm.style.display = "none"
+    }
+}
