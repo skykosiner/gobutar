@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/payee"
 	"github.com/skykosiner/gobutar/pkg/templates"
 )
@@ -116,6 +117,10 @@ func SendNewTransactionForm(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var newTransaction struct {
 			Payees []string
+			Items  []struct {
+				ID   string
+				Name string
+			}
 		}
 
 		payees, err := payee.GetPayees(db)
@@ -129,7 +134,22 @@ func SendNewTransactionForm(db *sql.DB) http.HandlerFunc {
 			newTransaction.Payees = append(newTransaction.Payees, p.Name)
 		}
 
-		fmt.Println(newTransaction)
+		it, err := items.GetItems(db)
+		if err != nil {
+			slog.Error("Error getting items", "error", err)
+			http.Error(w, "Sorry there was an error please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		for _, i := range it {
+			newTransaction.Items = append(newTransaction.Items, struct {
+				ID   string
+				Name string
+			}{
+				i.ID,
+				i.Name,
+			})
+		}
 
 		templates.RenderTemplate(w, "new-transaction", newTransaction)
 	}

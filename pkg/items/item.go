@@ -42,7 +42,6 @@ func (i Item) String() string {
 	return fmt.Sprintf("ID: %s\nName: %s\nPrice: %f\nRecuring: %s, SectionID: %d", i.ID, i.Name, i.Price, i.Recurring, i.SectionID)
 }
 
-
 func ParseRecurring(value string) (Recurring, error) {
 	switch value {
 	case string(No), string(Monthly), string(Weekly), string(Yearly), string(Daily):
@@ -74,4 +73,25 @@ func SaveItem(db *sql.DB, item Item) error {
 	query := "INSERT INTO items (id, name, price, saved, recurring, section_id) VALUES (?,?,?,?,?,?)"
 	_, err := db.Exec(query, item.ID, item.Name, item.Price, item.Saved, item.Recurring, item.SectionID)
 	return err
+}
+
+func GetItems(db *sql.DB) ([]Item, error) {
+	var items []Item
+	rows, err := db.Query("SELECT * FROM items")
+	if err != nil {
+		return items, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item Item
+		if err := rows.Scan(&item.ID, &item.Name, &item.Price, &item.Recurring, &item.SectionID, &item.Saved); err != nil {
+			return items, err
+		}
+
+		items = append(items, item)
+	}
+
+	return items, nil
 }
