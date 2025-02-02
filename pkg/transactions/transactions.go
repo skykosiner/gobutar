@@ -3,11 +3,11 @@ package transactions
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
 
+	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/items"
 	"github.com/skykosiner/gobutar/pkg/payee"
 	"github.com/skykosiner/gobutar/pkg/templates"
@@ -88,6 +88,34 @@ func NewTransaction(db *sql.DB) http.HandlerFunc {
 			slog.Error("Error creating new transaction in db", "error", err, "new transaction", newTransaction)
 			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 			return
+		}
+
+		if inflow > 0 {
+			_, err := db.Exec("UPDATE budget SET unallocated = unallocated + ? AND current_balance = current_balance + ?", inflow, inflow)
+			if err != nil {
+				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
+				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+				return
+			}
+		} else if outflow > 0 {
+			b, err := budget.NewBudget(db)
+			if err != nil {
+				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
+				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+				return
+			}
+
+			if outflow > b.CurrentBalance {
+				http.Error(w,"You're outflow is greater then your current balance", http.StatusBadRequest)
+				return
+			}
+
+			_, err = db.Exec("UPDATE budget SET current_balance = current_balance - ?", outflow)
+			if err != nil {
+				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
+				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		w.WriteHeader(http.StatusOK)
