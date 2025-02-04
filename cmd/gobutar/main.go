@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/a-h/templ"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/components"
@@ -85,24 +84,26 @@ func main() {
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
 
-	sectionsSlice, err := sections.GetSections(db)
-	if err != nil {
-		slog.Error("Error getting sections", "error", err)
-		return
-	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		sectionsSlice, err := sections.GetSections(db)
+		if err != nil {
+			slog.Error("Error getting sections", "error", err)
+			return
+		}
 
-	b, err := budget.NewBudget(db)
-	if err != nil {
-		slog.Error("Error getting budget", "error", err)
-		return
-	}
+		b, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget", "error", err)
+			return
+		}
 
-	home := components.Home(components.Page{
-		Budget:   b,
-		Sections: sectionsSlice,
+		home := components.Home(components.Page{
+			Budget:   b,
+			Sections: sectionsSlice,
+		})
+		home.Render(r.Context(), w)
 	})
 
-	http.Handle("/", templ.Handler(home))
 	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		t, err := transactions.GetTransactions(db)
 		if err != nil {
