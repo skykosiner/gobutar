@@ -1,39 +1,41 @@
 package components
 
 import (
-	"fmt"
-	"github.com/skykosiner/gobutar/pkg/transactions"
-	"github.com/skykosiner/gobutar/pkg/utils"
-	"strconv"
+"fmt"
+"github.com/skykosiner/gobutar/pkg/transactions"
+"github.com/skykosiner/gobutar/pkg/utils"
+"strconv"
 )
 
 css table() {
-	border-collapse: collapse;
-	margin: 25px 0;
-	width: 95%;
+border-collapse: collapse;
+margin: 25px 0;
+width: 95%;
 }
 
 css header() {
-	padding-top: 0.5rem;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	width: 95%;
+padding-top: 0.5rem;
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+width: 95%;
 }
 
 templ Transactions(ts []transactions.Transaction, currentBalance float64) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<link rel="stylesheet" href="/src/index.css"/>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-			<title>Gobutar</title>
-		</head>
-		<body>
-			<style>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/src/index.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <title>Gobutar</title>
+</head>
+
+<body>
+    <style>
         th {
             padding: 0.2rem;
             background-color: #20E5A4;
@@ -79,59 +81,53 @@ templ Transactions(ts []transactions.Transaction, currentBalance float64) {
             transform: scale(1.01);
         }
     </style>
-			@navbar()
-			<div class="center">
-				<h1 style="font-size: 1.5rem; padding-top: 0.5rem;">Current Balance: £{ utils.FormatFloat(currentBalance) }</h1>
-				<div class={ header() }>
-					<button
-						hx-get="/api/transaction/new-form"
-						hx-target="#new-form-transaction"
-						hx-swap="innerHTML"
-						class="new-transaction"
-					>New Transaction</button>
-					<div id="new-form-transaction"></div>
-					<form>
-						<input name="out" type="text" placeholder="Search"/>
-					</form>
-				</div>
-				<table class={ table() }>
-					<thead>
-						<tr>
-							<th></th>
-							<th>Name</th>
-							<th>Date</th>
-							<th>Payee</th>
-							<th>Outflow</th>
-							<th>Inflow</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, s := range ts {
-							<tr class="row">
-								<td><input id="check" type="checkbox" data-id={ strconv.Itoa(s.ID) }/></td>
-								<td>{ s.ItemName }</td>
-								<td>{ s.PurchaseDate }</td>
-								<td>{ s.Payee }</td>
-								<td>£{ utils.FormatFloat(s.Outflow) }</td>
-								<td>£{ utils.FormatFloat(s.Inflow) }</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-				for _, s := range ts {
-					<div id={ strconv.Itoa(s.ID) } class="options">
-						<!-- TODO: make items reload after deleting an item -->
-						<button
-							hx-post={ fmt.Sprintf("/api/transaction/delete?id=%d", s.ID) }
-							hx-trigger="click"
-							hx-target="#delete-result"
-						>Delete</button>
-						<div id="delete-result"></div>
-					</div>
-				}
-			</div>
-			@footer()
-			<script stype="module" src="/src/app.js"></script>
-		</body>
-	</html>
+    @navbar()
+    <div class="center">
+        <h1 style="font-size: 1.5rem; padding-top: 0.5rem;">Current Balance: £{ utils.FormatFloat(currentBalance) }</h1>
+        <div class={ header() }>
+            <button hx-get="/api/transaction/new-form" hx-target="#new-form-transaction" hx-swap="innerHTML"
+                class="new-transaction">New Transaction</button>
+            <div id="new-form-transaction"></div>
+            <form>
+                <input name="out" type="text" placeholder="Search" />
+            </form>
+        </div>
+        <table class={ table() }>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Payee</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Outflow</th>
+                    <th>Inflow</th>
+                </tr>
+            </thead>
+            <tbody>
+                for _, s := range ts {
+                <tr class="row">
+                    <td><input id="check" type="checkbox" data-id={ strconv.Itoa(s.ID) } /></td>
+                    <td>{ s.Payee }</td>
+                    <td>{ s.PurchaseDate }</td>
+                    <td>{ s.ItemName }</td>
+                    <td>£{ utils.FormatFloat(s.Outflow) }</td>
+                    <td>£{ utils.FormatFloat(s.Inflow) }</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        for _, s := range ts {
+        <div id={ strconv.Itoa(s.ID) } class="options">
+            <!-- TODO: make items reload after deleting an item -->
+            <button hx-post={ fmt.Sprintf("/api/transaction/delete?id=%d", s.ID) } hx-trigger="click"
+                hx-target="#delete-result">Delete</button>
+            <div id="delete-result"></div>
+        </div>
+        }
+    </div>
+    @footer()
+    <script stype="module" src="/src/app.js"></script>
+</body>
+
+</html>
 }
