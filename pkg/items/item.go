@@ -66,7 +66,7 @@ func AllocateMoneyForItem(itemID string, ammountToAlocate float64, db *sql.DB) e
 		return err
 	}
 
-	return b.SetUnallocated(db, ammountToAlocate)
+	return b.SetUnallocated(ammountToAlocate)
 }
 
 func SaveItem(db *sql.DB, item Item) error {
@@ -94,4 +94,25 @@ func GetItems(db *sql.DB) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func FindItem(db *sql.DB, id string) (Item, error) {
+	var item Item
+	row := db.QueryRow("SELECT * FROM items WHERE id = ?", id)
+	if row.Err() != nil {
+		return item, row.Err()
+	}
+
+	if err := row.Scan(&item.ID, &item.Name, &item.Price, &item.Recurring, &item.SectionID, &item.Saved); err != nil {
+		return item, err
+	}
+
+	return item, nil
+}
+
+func (i *Item) UpdateSaved(db *sql.DB, newAmmount float64) error {
+	_, err := db.Exec("UPDATE items SET saved = ? WHERE id = ?", newAmmount, i.ID)
+	// TODO: Shooed probably only do this if there isn't an error lol
+	i.Saved = newAmmount
+	return err
 }

@@ -91,14 +91,14 @@ func main() {
 		return
 	}
 
-	budget, err := budget.NewBudget(db)
+	b, err := budget.NewBudget(db)
 	if err != nil {
 		slog.Error("Error getting budget", "error", err)
 		return
 	}
 
 	home := components.Home(components.Page{
-		Budget:   budget,
+		Budget:   b,
 		Sections: sectionsSlice,
 	})
 
@@ -110,7 +110,12 @@ func main() {
 			return
 		}
 
-		spentComponent := components.Transactions(t)
+		b, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget.", "error", err, "budget", b)
+			return
+		}
+		spentComponent := components.Transactions(t, b.CurrentBalance)
 		spentComponent.Render(r.Context(), w)
 	})
 

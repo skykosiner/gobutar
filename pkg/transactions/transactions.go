@@ -68,6 +68,7 @@ func NewTransaction(db *sql.DB) http.HandlerFunc {
 			Outflow      string `json:"outflow"`
 			Inflow       string `json:"inflow"`
 		}
+
 		if err := json.NewDecoder(r.Body).Decode(&newTransaction); err != nil {
 			slog.Warn("Possible bad user input or error adding new transaction.", "error", err, "r.body", r.Body)
 			http.Error(w, "Please make sure you entered all the information correctly.", http.StatusBadRequest)
@@ -83,39 +84,59 @@ func NewTransaction(db *sql.DB) http.HandlerFunc {
 		outflow, _ := strconv.ParseFloat(newTransaction.Outflow, 64)
 		inflow, _ := strconv.ParseFloat(newTransaction.Inflow, 64)
 
-		_, err := db.Exec("INSERT INTO transactions (payee, purchase_date, item_id, outflow, inflow) VALUES (?,?,?,?,?)", newTransaction.Payee, newTransaction.PurchaseDate, newTransaction.ItemID, outflow, inflow)
+		// Update item and budget table
+		item, err := items.FindItem(db, newTransaction.ItemID)
 		if err != nil {
-			slog.Error("Error creating new transaction in db", "error", err, "new transaction", newTransaction)
+			slog.Error("Error getting item used for new transaction.", "error", err, "new transaction", newTransaction)
 			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 			return
 		}
 
-		if inflow > 0 {
-			_, err := db.Exec("UPDATE budget SET unallocated = unallocated + ? AND current_balance = current_balance + ?", inflow, inflow)
-			if err != nil {
-				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
-				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
-				return
-			}
-		} else if outflow > 0 {
-			b, err := budget.NewBudget(db)
-			if err != nil {
-				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
+		b, err := budget.NewBudget(db)
+		if err != nil {
+			slog.Error("Error getting budget.", "error", err, "new transaction", newTransaction)
+			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		if outflow > b.CurrentBalance {
+			http.Error(w, "You can't spend more then you have.", http.StatusBadRequest)
+			return
+		}
+
+		if outflow > 0 {
+			if err := b.SetCurrentBalance(b.CurrentBalance - outflow); err != nil {
+				slog.Error("Error updating budget table.", "error", err, "new transaction", newTransaction, "budget", b)
 				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 				return
 			}
 
-			if outflow > b.CurrentBalance {
-				http.Error(w,"You're outflow is greater then your current balance", http.StatusBadRequest)
-				return
-			}
-
-			_, err = db.Exec("UPDATE budget SET current_balance = current_balance - ?", outflow)
-			if err != nil {
-				slog.Error("Error updating budget database.", "error", err, "new transaction", newTransaction)
+			// Set the saved on the item to minus the outflow
+			if err := item.UpdateSaved(db, item.Saved-outflow); err != nil {
+				slog.Error("Error updating item data.", "error", err, "new transaction", newTransaction, "item", item)
 				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
 				return
 			}
+		} else if inflow > 0 {
+			if err := b.SetCurrentBalance(b.CurrentBalance + inflow); err != nil {
+				slog.Error("Error updating budget table.", "error", err, "new transaction", newTransaction, "budget", b)
+				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+				return
+			}
+
+			_, err := db.Exec("UPDATE budget SET unallocated = unallocated + ?", inflow)
+			if err != nil {
+				slog.Error("Error updating budget table.", "error", err, "new transaction", newTransaction, "budget", b)
+				http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+				return
+			}
+		}
+
+		_, err = db.Exec("INSERT INTO transactions (payee, purchase_date, item_id, outflow, inflow) VALUES (?,?,?,?,?)", newTransaction.Payee, newTransaction.PurchaseDate, newTransaction.ItemID, outflow, inflow)
+		if err != nil {
+			slog.Error("Error creating new transaction in db", "error", err, "new transaction", newTransaction)
+			http.Error(w, "Sorry there was an error, please try again.", http.StatusInternalServerError)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -146,8 +167,9 @@ func SendNewTransactionForm(db *sql.DB) http.HandlerFunc {
 		var newTransaction struct {
 			Payees []string
 			Items  []struct {
-				ID   string
-				Name string
+				ID        string
+				Name      string
+				Allocated float64
 			}
 		}
 
@@ -171,11 +193,13 @@ func SendNewTransactionForm(db *sql.DB) http.HandlerFunc {
 
 		for _, i := range it {
 			newTransaction.Items = append(newTransaction.Items, struct {
-				ID   string
-				Name string
+				ID        string
+				Name      string
+				Allocated float64
 			}{
 				i.ID,
 				i.Name,
+				i.Saved,
 			})
 		}
 

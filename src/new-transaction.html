@@ -10,13 +10,13 @@
 
     <select name="item_id">
         {{ range .Items}}
-        <option value="{{.ID}}">{{.Name}}</option>
+        <option value="{{.ID}}">{{.Name}} £{{formatFloat .Allocated}}</option>
         {{end}}
     </select>
 
     <input name="purchase_date" type="date" />
-    <input name="outflow" type="number" placeholder="Outflow" />
-    <input name="inflow" type="number" placeholder="inflow" />
+    <input name="outflow" type="number" placeholder="Outflow" step="0.01"/>
+    <input name="inflow" type="number" placeholder="inflow" step="0.01"/>
     <input type="submit" value="New Transaction" />
 </form>
 

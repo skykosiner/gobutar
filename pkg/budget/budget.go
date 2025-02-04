@@ -5,6 +5,7 @@ import (
 )
 
 type Budget struct {
+	db             *sql.DB
 	Unallocated    float64 `sql:"unallocated"`
 	Allocated      float64 `sql:"allocated"`
 	CurrentBalance float64 `sql:"current_balance"`
@@ -28,6 +29,7 @@ func NewBudget(db *sql.DB) (Budget, error) {
 	}
 
 	return Budget{
+		db,
 		unallocated,
 		allocated,
 		currentBalance,
@@ -36,8 +38,16 @@ func NewBudget(db *sql.DB) (Budget, error) {
 	}, nil
 }
 
-func (b *Budget) SetUnallocated(db *sql.DB, newAmount float64) error {
+func (b *Budget) SetUnallocated(newAmount float64) error {
 	query := "UPDATE budget SET allocated = allocated + ?, unallocated = unallocated - ?"
-	_, err := db.Exec(query, newAmount, newAmount)
+	_, err := b.db.Exec(query, newAmount, newAmount)
+	b.Allocated, b.Unallocated = b.Allocated+newAmount, b.Unallocated-newAmount
+	return err
+}
+
+func (b *Budget) SetCurrentBalance(newAmount float64) error {
+	query := "UPDATE budget SET current_balance = ?"
+	_, err := b.db.Exec(query, newAmount)
+	b.CurrentBalance = newAmount
 	return err
 }

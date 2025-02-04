@@ -21,7 +21,7 @@ css header() {
 	width: 95%;
 }
 
-templ Transactions(ts []transactions.Transaction) {
+templ Transactions(ts []transactions.Transaction, currentBalance float64) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -81,9 +81,15 @@ templ Transactions(ts []transactions.Transaction) {
     </style>
 			@navbar()
 			<div class="center">
+				<h1 style="font-size: 1.5rem; padding-top: 0.5rem;">Current Balance: £{ utils.FormatFloat(currentBalance) }</h1>
 				<div class={ header() }>
-					<button hx-get="/api/transaction/new-form" hx-target="#new-form-transaction" hx-swap="innerHTML" class="new-transaction">New Transaction</button>
-                    <div id="new-form-transaction"></div>
+					<button
+						hx-get="/api/transaction/new-form"
+						hx-target="#new-form-transaction"
+						hx-swap="innerHTML"
+						class="new-transaction"
+					>New Transaction</button>
+					<div id="new-form-transaction"></div>
 					<form>
 						<input name="out" type="text" placeholder="Search"/>
 					</form>
@@ -106,8 +112,8 @@ templ Transactions(ts []transactions.Transaction) {
 								<td>{ s.ItemName }</td>
 								<td>{ s.PurchaseDate }</td>
 								<td>{ s.Payee }</td>
-								<td>{ utils.FormatFloat(s.Outflow) }</td>
-								<td>{ utils.FormatFloat(s.Inflow) }</td>
+								<td>£{ utils.FormatFloat(s.Outflow) }</td>
+								<td>£{ utils.FormatFloat(s.Inflow) }</td>
 							</tr>
 						}
 					</tbody>
