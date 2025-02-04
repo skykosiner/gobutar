@@ -34,7 +34,7 @@ func footer() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style type=\"text/css\">\n    a {\n        color: #5899D9;\n        transition: 0.3s ease-in-out;\n    }\n\n    a:hover {\n        color: #3897D3;\n    }\n\n    .footer {\n        position: fixed;\n        bottom: 0rem;\n        width: 100%;\n        height: 3rem;\n        display: flex;\n        flex-direction: column;\n        justify-content: center;\n        align-items: center;\n        background-color: #F1F1F1;\n    }\n\n    .footer * {\n        background-color: #F1F1F1;\n    }\n\n    .footer>p {\n        margin: 0;\n        padding: 0.1rem;\n    }\n</style><footer class=\"footer\"><p>Gobutar ©")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style type=\"text/css\">\n    a {\n        color: #5899D9;\n        transition: 0.3s ease-in-out;\n    }\n\n    a:hover {\n        color: #3897D3;\n    }\n\n    .footer {\n        position: fixed;\n        bottom: 0rem;\n        width: 100%;\n        height: 3rem;\n        display: flex;\n        flex-direction: column;\n        justify-content: center;\n        align-items: center;\n        background-color: var(--color-background-secondary);\n    }\n\n    .footer * {\n        background-color: var(--color-background-secondary);\n    }\n\n    .footer>p {\n        margin: 0;\n        padding: 0.1rem;\n    }\n</style><footer class=\"footer\"><p>Gobutar ©")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

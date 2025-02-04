@@ -1,9 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter&family=Roboto&display=swap");
 
+:root {
+    --color-accent: #20E5A4;
+    --color-button-foreground: #333333;
+
+    /* Light theme variables */
+    --color-background-light: #FFFFFF;
+    --color-foreground-light: #333333;
+    --color-foreground-secondary-light: #000000;
+    --color-background-secondary-light: #F6F3F3;
+    --color-svg-fill-light: #333333;
+    --color-border-light: #e9ecef;
+
+    /* Dark theme variables */
+    --color-background-dark: #1f2023;
+    --color-foreground-dark: #efefef;
+    --color-foreground-secondary-dark: #FFFFFF;
+    --color-background-secondary-dark: #2c2d30;
+    --color-svg-fill-dark: #efefef;
+    --color-border-dark: #6c757d;
+}
+
+.light {
+    --color-background: var(--color-background-light);
+    --color-foreground: var(--color-foreground-light);
+    --color-background-secondary: var(--color-background-secondary-light);
+    --color-svg-fill: var(--color-svg-fill-light);
+    --color-border: var(--color-border-light);
+    --color-foreground-secondary: var(--color-foreground-secondary-light);
+}
+
+.dark {
+    --color-background: var(--color-background-dark);
+    --color-foreground: var(--color-foreground-dark);
+    --color-background-secondary: var(--color-background-secondary-dark);
+    --color-svg-fill: var(--color-svg-fill-dark);
+    --color-border: var(--color-border-dark);
+    --color-foreground-secondary: var(--color-foreground-secondary-dark);
+}
+
 * {
     margin: 0;
     padding: 0;
-    color: #111111;
+    color: var(--color-foreground);
+    background: var(--color-background);
     overflow-x: hidden;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;

@@ -4,7 +4,7 @@ future
 - [ ] Multiple accounts such as debit card 1, debit card 2, PayPal, cash and so on
 - [ ] Budget for each different month, be able to put money towards something
 for the next month and so on
-- [ ] Light and dark mode
+- [x] Light and dark mode
 - [ ] Username and password to login on hosted instance
 - [ ] Chance currency, such as GBP, USD, and all others
 - [ ] Unallocated number at the top of the home page should be clickable then
