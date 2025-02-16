@@ -1,3 +1,5 @@
+- [ ] Tests
+
 - [ ] When user first signs up show a welcome screen and let them pick a
 username/password and currency, will probably add more to this screen in the
 future
