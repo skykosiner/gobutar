@@ -10,32 +10,29 @@ import (
 )
 
 type User struct {
-	ID       int
 	Email    string `sql:"email"`
 	Password string `sql:"password"`
 }
 
-func hashPassword(password string) (string, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+func (u *User) hashPassword() error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return string(hashedPassword), nil
+	u.Password = string(hashedPassword)
+
+	return nil
 }
 
-func validPassword(inputPassword, storedPassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(inputPassword))
+func (u User) validPassword(correctPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(correctPassword), []byte(u.Password))
 	return err == nil
-
 }
 
 func NewUser(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var newUserReq struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		}
+		var newUserReq User
 
 		if err := json.NewDecoder(r.Body).Decode(&newUserReq); err != nil {
 			slog.Error("Error getting new user json request.", "error", err, "r", r)
@@ -43,17 +40,65 @@ func NewUser(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		hashedPass, err := hashPassword(newUserReq.Password)
-		if err != nil {
+		if err := newUserReq.hashPassword(); err != nil {
 			slog.Error("Error hashing user password.", "error", err, "new user", newUserReq)
 			http.Error(w, "Error hashing your password. Please try again.", http.StatusBadRequest)
 			return
 		}
 
-		if _, err = db.Exec("INSERT INTO users (email, password) VALUES (?,?)", newUserReq.Email, hashedPass); err != nil {
+		if _, err := db.Exec("INSERT INTO users (email, password) VALUES (?,?)", newUserReq.Email, newUserReq.Password); err != nil {
 			slog.Error("Error creating new user.", "error", err, "new user", newUserReq)
 			http.Error(w, "Sorry there was an error please try again.", http.StatusBadRequest)
 			return
 		}
+	}
+}
+
+func Login(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var loginRequest User
+
+		if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
+			slog.Error("Error getting JSON request to login.", "error", err, "r", r)
+			http.Error(w, "Error decoding your login request. Please try again.", http.StatusBadRequest)
+
+			return
+		}
+
+		// There is only one user so this is fine, this is just self hosted so
+		// it doesn't need to support loads of users
+		rows, err := db.Query("SELECT * FROM user;")
+		if err != nil {
+			slog.Error("Error finding user in the database.", "error", err, "user info", loginRequest)
+			http.Error(w, "Error please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		defer rows.Close()
+
+		if !rows.Next() {
+			http.Error(w, "Please make sure that your user account exists.", http.StatusBadRequest)
+			return
+		}
+
+		var dbUser User
+		if err := rows.Scan(&dbUser.Email, &dbUser.Password); err != nil {
+			slog.Error("Error getting your user from the database.", "error", err)
+			http.Error(w, "Error getting your info from the database. Please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		if loginRequest.Email != dbUser.Email {
+			http.Error(w, "The email you entered isn't correct.", http.StatusBadRequest)
+			return
+		}
+
+		if !loginRequest.validPassword(dbUser.Password) {
+			http.Error(w, "Your password is incorrect.", http.StatusUnauthorized)
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+		})
 	}
 }

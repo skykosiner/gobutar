@@ -36,8 +36,7 @@ func main() {
 		FOREIGN KEY (section_id) REFERENCES sections (id) ON DELETE CASCADE
 	);
 
-	CERATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+	CREATE TABLE IF NOT EXISTS user (
 		email TEXT NOT NULL,
 		password TEXT NOT NULL
 	);
