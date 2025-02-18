@@ -1,21 +1,7 @@
 package components
 
 templ Login() {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<link rel="stylesheet" href="/src/index.css"/>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-			<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-			<title>Gobutar | Login</title>
-		</head>
-		<body>
-			@navbar()
-			<h1>Login</h1>
-			@footer()
-			<script stype="module" src="/src/app.js"></script>
-		</body>
-	</html>
+@layout("Login") {
+<h1>Login</h1>
+}
 }

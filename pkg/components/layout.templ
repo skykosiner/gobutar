@@ -1,0 +1,23 @@
+package components
+
+templ layout(title string) {
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/src/index.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <title>Gobutar | { title }</title>
+</head>
+
+<body>
+    @navbar()
+    { children... }
+    @footer()
+    <script stype="module" src="/src/app.js"></script>
+</body>
+
+</html>
+}
