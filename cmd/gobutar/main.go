@@ -90,7 +90,7 @@ func main() {
 
 	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
 
-	http.Handle("/", user.IsUserLoggedIn(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.Handle("/", user.FirstTime(db, user.IsUserLoggedIn(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sectionsSlice, err := sections.GetSections(db)
 		if err != nil {
 			slog.Error("Error getting sections", "error", err)
@@ -108,7 +108,7 @@ func main() {
 			Sections: sectionsSlice,
 		})
 		home.Render(r.Context(), w)
-	})))
+	}))))
 
 	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		t, err := transactions.GetTransactions(db)
