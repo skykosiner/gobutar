@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -98,7 +99,23 @@ func Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Just do a cookie I guess, and add middlewear we can call to check if
+		// the user is logged in
+		jwtToken, err := CreateJWT(loginRequest.Email)
+		if err != nil {
+			slog.Error("Erorr creating JWT token.", "error", err)
+			http.Error(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
+			return
+		}
+
 		http.SetCookie(w, &http.Cookie{
+			Name:     "JWT",
+			Value:    jwtToken,
+			Expires:  time.Now().AddDate(0, 0, 90),
+			HttpOnly: true,
+			Secure:   true,
+			Path:     "/",
+			SameSite: http.SameSiteNoneMode,
 		})
 	}
 }

@@ -9,5 +9,6 @@ require (
 
 require (
 	github.com/a-h/templ v0.3.819 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	golang.org/x/crypto v0.33.0
 )
