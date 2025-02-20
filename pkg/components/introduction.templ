@@ -1,17 +1,36 @@
 package components
 
 templ Introduction() {
-@layout("Introduction") {
-<div>
-    <div class="slide">
-        <h2>Please Set Your Currency</h2>
-        <form>
-            <select>
-                <option value="GBP">£ GBP</option>
-                <option value="USD">$ USD</option>
-            </select>
-        </form>
-    </div>
-</div>
-}
+	@layout("Introduction") {
+		<style>
+    .slades {}
+
+    .slide {
+        display: none;
+    }
+
+    .prev-next {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+		<div class="slides">
+			<div class="slide" id="slide-1">
+				<h2>Please Set Your Currency</h2>
+				<form>
+					<select>
+						<option value="GBP">£ GBP</option>
+						<option value="USD">$ USD</option>
+					</select>
+				</form>
+			</div>
+			<div class="slide" id="slide-2">
+				<h1>Test</h1>
+			</div>
+			<div class="prev-next">
+				<button id="prev">{ "<-" }</button>
+				<button id="next">{ "->" }</button>
+			</div>
+		</div>
+	}
 }

@@ -29,6 +29,27 @@ function setDarkMode(darkmode, toggle) {
         toggle.innerHTML = "🌙"
     }
 }
+/** @type {string[]}*/
+const slideList = [
+    "slide-1",
+    "slide-2"
+]
+
+/**
+    * @param {number} idx
+*/
+function changeSlide(idx) {
+    slideList.map(slide => {
+        console.log(idx, slideList.indexOf(slide));
+        if (slideList.indexOf(slide) === idx) {
+            document.getElementById(slide).style.display = "block";
+        } else {
+            document.getElementById(slide).style.display = "none";
+        }
+    });
+}
+
+let slideIdx = 0;
 
 window.onload = () => {
     const toggle = document.getElementById("theme-toggle")
@@ -43,6 +64,29 @@ window.onload = () => {
         localStorage.setItem("dark-mode", newTheme.toString())
         setDarkMode(!darkmode, toggle)
     }
+
+    // Introduction/slide stuff
+    if (document.title.includes("Introduction")) {
+        document.getElementById("slide-1").style.display = "block";
+    };
+
+    document.getElementById("next").addEventListener("click", () => {
+        if (slideIdx + 1 < 0 || slideIdx + 1 >= slideList.length) {
+            return
+        }
+
+        slideIdx += 1
+        changeSlide(slideIdx)
+    });
+
+    document.getElementById("prev").addEventListener("click", () => {
+        if (slideIdx - 1 < 0 || slideIdx - 1 >= slideList.length) {
+            return
+        }
+
+        slideIdx -= 1
+        changeSlide(slideIdx)
+    });
 }
 
 
@@ -67,10 +111,11 @@ document.querySelectorAll("#check").forEach(checkbox => {
 });
 
 function newTransaction() {
-    const newTransactionForm = document.getElementById("new-transaction")
+    const newTransactionForm = document.getElementById("new-transaction");
     if (window.getComputedStyle(newTransactionForm, null).getPropertyValue("display") === "none") {
-        newTransactionForm.style.display = "block"
+        newTransactionForm.style.display = "block";
     } else {
-        newTransactionForm.style.display = "none"
+        newTransactionForm.style.display = "none";
     }
 }
+
