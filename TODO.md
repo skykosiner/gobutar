@@ -3,6 +3,7 @@
 - [ ] When user first signs up show a welcome screen and let them pick a
 username/password and currency, will probably add more to this screen in the
 future
+
 - [ ] Multiple accounts such as debit card 1, debit card 2, PayPal, cash and so on
 - [ ] Budget for each different month, be able to put money towards something
 for the next month and so on
