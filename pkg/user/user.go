@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -13,6 +14,18 @@ import (
 type User struct {
 	Email    string `sql:"email"`
 	Password string `sql:"password"`
+	Currency string `sql:"currency"`
+}
+
+func (u *User) GetCurrencySymbol() string {
+	switch u.Currency {
+	case "GBP":
+		return "£"
+	case "USD":
+		return "$"
+	}
+
+	return "$"
 }
 
 func (u *User) hashPassword() error {
@@ -47,11 +60,32 @@ func NewUser(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if _, err := db.Exec("INSERT INTO users (email, password) VALUES (?,?)", newUserReq.Email, newUserReq.Password); err != nil {
+		if _, err := db.Exec("INSERT INTO user (email, password) VALUES (?,?)", newUserReq.Email, newUserReq.Password); err != nil {
 			slog.Error("Error creating new user.", "error", err, "new user", newUserReq)
 			http.Error(w, "Sorry there was an error please try again.", http.StatusBadRequest)
 			return
 		}
+
+		jwtToken, err := CreateJWT(newUserReq.Email)
+		if err != nil {
+			slog.Error("Erorr creating JWT token.", "error", err)
+			http.Error(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
+			return
+		}
+
+		isFirstTime = false
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "JWT",
+			Value:    jwtToken,
+			Expires:  time.Now().AddDate(0, 0, 90),
+			HttpOnly: true,
+			Secure:   true,
+			Path:     "/",
+			SameSite: http.SameSiteNoneMode,
+		})
+
+		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }
 
@@ -89,6 +123,8 @@ func Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		fmt.Println(dbUser)
+
 		if loginRequest.Email != dbUser.Email {
 			http.Error(w, "The email you entered isn't correct.", http.StatusBadRequest)
 			return
@@ -117,5 +153,24 @@ func Login(db *sql.DB) http.HandlerFunc {
 			Path:     "/",
 			SameSite: http.SameSiteNoneMode,
 		})
+
+		http.Redirect(w, r, "/", http.StatusOK)
+	}
+}
+
+func Logout() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:     "JWT",
+			Value:    "",
+			Expires:  time.Unix(0, 0),
+			MaxAge:   -1,
+			HttpOnly: true,
+			Secure:   true,
+			Path:     "/",
+			SameSite: http.SameSiteNoneMode,
+		})
+
+		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }

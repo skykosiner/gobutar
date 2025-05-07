@@ -3,15 +3,48 @@ package components
 templ Introduction() {
 	@layout("Introduction") {
 		<style>
-    .slades {}
+    .slides {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
 
     .slide {
         display: none;
     }
 
     .prev-next {
+        margin: 5rem;
+    }
+
+    .prev-next>button {
+        background-color: var(--color-background-secondary);
+        border: none;
+        padding: 0.5rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    form {
+        padding-top: 0.3rem;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    form>select {
+        border: none;
+        background-color: var(--color-background-secondary);
+        padding: 0.5rem;
+    }
+
+    form>input {
+        border: none;
+        background-color: var(--color-background-secondary);
+        padding: 0.5rem;
     }
 </style>
 		<div class="slides">
@@ -25,8 +58,9 @@ templ Introduction() {
 				</form>
 			</div>
 			<div class="slide" id="slide-2">
-				<form>
-					<input type="text" name="username" placeholder="Username: "/>
+				<h2>Create Your Account</h2>
+				<form hx-post="/api/user/sign-up" hx-ext="json-enc">
+					<input type="email" name="email" placeholder="Email: "/>
 					<input type="password" name="password" placeholder="Password: "/>
 					<input type="submit" placeholder="Create"/>
 				</form>

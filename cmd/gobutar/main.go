@@ -39,7 +39,8 @@ func main() {
 
 	CREATE TABLE IF NOT EXISTS user (
 		email TEXT NOT NULL,
-		password TEXT NOT NULL
+		password TEXT NOT NULL,
+		currency TEXT NOT NULL
 	);
 
 	CREATE TABLE IF NOT EXISTS budget (
@@ -77,20 +78,30 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/api/item/allocate", items.AllocateItemRoute(db))
-	http.HandleFunc("/api/item/new", items.NewItemRoute(db))
+	user.CheckFirstTime(db)
 
-	http.HandleFunc("/api/section/new-color", sections.SectionNewColor(db))
+	privateMux := http.NewServeMux()
+	publicMux := http.NewServeMux()
 
-	http.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
-	http.HandleFunc("/api/transaction/delete", transactions.DeleteTransaction(db))
-	http.HandleFunc("/api/transaction/new-form", transactions.SendNewTransactionForm(db))
+	publicMux.HandleFunc("/api/user/sign-up", user.NewUser(db))
+	publicMux.HandleFunc("/api/user/login", user.Login(db))
 
-	http.Handle("/api/get-form-new-item", sections.SendNewItemForm(db))
+	privateMux.HandleFunc("/api/user/logout", user.Logout())
 
-	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
+	privateMux.HandleFunc("/api/item/allocate", items.AllocateItemRoute(db))
+	privateMux.HandleFunc("/api/item/new", items.NewItemRoute(db))
 
-	http.Handle("/", user.FirstTime(db, user.IsUserLoggedIn(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	privateMux.HandleFunc("/api/section/new-color", sections.SectionNewColor(db))
+
+	privateMux.HandleFunc("/api/transaction/new", transactions.NewTransaction(db))
+	privateMux.HandleFunc("/api/transaction/delete", transactions.DeleteTransaction(db))
+	privateMux.HandleFunc("/api/transaction/new-form", transactions.SendNewTransactionForm(db))
+
+	privateMux.HandleFunc("/api/get-form-new-item", sections.SendNewItemForm(db))
+
+	publicMux.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("./src"))))
+
+	privateMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		sectionsSlice, err := sections.GetSections(db)
 		if err != nil {
 			slog.Error("Error getting sections", "error", err)
@@ -108,9 +119,9 @@ func main() {
 			Sections: sectionsSlice,
 		})
 		home.Render(r.Context(), w)
-	}))))
+	})
 
-	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+	privateMux.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
 		t, err := transactions.GetTransactions(db)
 		if err != nil {
 			slog.Error("Error getting spent items.", "error", err, "spent", t)
@@ -126,7 +137,14 @@ func main() {
 		spentComponent.Render(r.Context(), w)
 	})
 
-	if err := http.ListenAndServe(":42069", nil); err != nil {
+	finalMux := http.NewServeMux()
+	finalMux.Handle("/api/user/login", publicMux)
+	finalMux.Handle("/api/user/sign-up", publicMux)
+	finalMux.Handle("/src/", publicMux)
+	finalMux.Handle("/", user.FirstTime(db, user.IsUserLoggedIn(privateMux)))
+	// finalMux.Handle("/", privateMux)
+
+	if err := http.ListenAndServe(":42069", finalMux); err != nil {
 		slog.Error("Error starting webserver", "error", err)
 	}
 }

@@ -1,7 +1,30 @@
 package components
 
 templ Login() {
-@layout("Login") {
-<h1>Login</h1>
-}
+	@layout("Login") {
+		<style>
+    h1 {
+        font-size: 2rem;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    form>input {
+        border: none;
+        background-color: var(--color-background-secondary);
+        padding: 0.5rem;
+    }
+</style>
+		<div class="center">
+			<h1>Login</h1>
+			<form hx-post="/api/user/login" hx-ext="json-enc">
+				<input type="email" name="email" placeholder="Email: "/>
+				<input type="password" name="password" placeholder="Password: "/>
+				<input type="submit" placeholder="Login"/>
+			</form>
+		</div>
+	}
 }
