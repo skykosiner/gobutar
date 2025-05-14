@@ -3,11 +3,11 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
+	"github.com/skykosiner/gobutar/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,6 +24,8 @@ func (u *User) GetCurrencySymbol() string {
 	case "USD":
 		return "$"
 	}
+
+	u.GetCurrencySymbol()
 
 	return "$"
 }
@@ -50,26 +52,26 @@ func NewUser(db *sql.DB) http.HandlerFunc {
 
 		if err := json.NewDecoder(r.Body).Decode(&newUserReq); err != nil {
 			slog.Error("Error getting new user json request.", "error", err, "r", r)
-			http.Error(w, "Error cerating user.", http.StatusBadRequest)
+			utils.HTMXError(w, "Error creating user.", http.StatusBadRequest)
 			return
 		}
 
 		if err := newUserReq.hashPassword(); err != nil {
 			slog.Error("Error hashing user password.", "error", err, "new user", newUserReq)
-			http.Error(w, "Error hashing your password. Please try again.", http.StatusBadRequest)
+			utils.HTMXError(w, "Error hashing your password. Please try again.", http.StatusBadRequest)
 			return
 		}
 
 		if _, err := db.Exec("INSERT INTO user (email, password) VALUES (?,?)", newUserReq.Email, newUserReq.Password); err != nil {
 			slog.Error("Error creating new user.", "error", err, "new user", newUserReq)
-			http.Error(w, "Sorry there was an error please try again.", http.StatusBadRequest)
+			utils.HTMXError(w, "Sorry there was an error please try again.", http.StatusBadRequest)
 			return
 		}
 
 		jwtToken, err := CreateJWT(newUserReq.Email)
 		if err != nil {
 			slog.Error("Erorr creating JWT token.", "error", err)
-			http.Error(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
+			utils.HTMXError(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
 			return
 		}
 
@@ -85,7 +87,8 @@ func NewUser(db *sql.DB) http.HandlerFunc {
 			SameSite: http.SameSiteNoneMode,
 		})
 
-		http.Redirect(w, r, "/", http.StatusOK)
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -95,7 +98,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 
 		if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
 			slog.Error("Error getting JSON request to login.", "error", err, "r", r)
-			http.Error(w, "Error decoding your login request. Please try again.", http.StatusBadRequest)
+			utils.HTMXError(w, "Error decoding your login request. Please try again.", http.StatusBadRequest)
 
 			return
 		}
@@ -105,33 +108,31 @@ func Login(db *sql.DB) http.HandlerFunc {
 		rows, err := db.Query("SELECT * FROM user;")
 		if err != nil {
 			slog.Error("Error finding user in the database.", "error", err, "user info", loginRequest)
-			http.Error(w, "Error please try again.", http.StatusInternalServerError)
+			utils.HTMXError(w, "Error please try again.", http.StatusInternalServerError)
 			return
 		}
 
 		defer rows.Close()
 
 		if !rows.Next() {
-			http.Error(w, "Please make sure that your user account exists.", http.StatusBadRequest)
+			utils.HTMXError(w, "Please make sure that your user account exists.", http.StatusBadRequest)
 			return
 		}
 
 		var dbUser User
 		if err := rows.Scan(&dbUser.Email, &dbUser.Password); err != nil {
 			slog.Error("Error getting your user from the database.", "error", err)
-			http.Error(w, "Error getting your info from the database. Please try again.", http.StatusInternalServerError)
+			utils.HTMXError(w, "Error getting your info from the database. Please try again.", http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Println(dbUser)
-
 		if loginRequest.Email != dbUser.Email {
-			http.Error(w, "The email you entered isn't correct.", http.StatusBadRequest)
+			utils.HTMXError(w, "The email you entered isn't correct.", http.StatusBadRequest)
 			return
 		}
 
 		if !loginRequest.validPassword(dbUser.Password) {
-			http.Error(w, "Your password is incorrect.", http.StatusUnauthorized)
+			utils.HTMXError(w, "Your password is incorrect.", http.StatusUnauthorized)
 			return
 		}
 
@@ -140,7 +141,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 		jwtToken, err := CreateJWT(loginRequest.Email)
 		if err != nil {
 			slog.Error("Erorr creating JWT token.", "error", err)
-			http.Error(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
+			utils.HTMXError(w, "Error logging you in. Please try again.", http.StatusInternalServerError)
 			return
 		}
 
@@ -154,7 +155,8 @@ func Login(db *sql.DB) http.HandlerFunc {
 			SameSite: http.SameSiteNoneMode,
 		})
 
-		http.Redirect(w, r, "/", http.StatusOK)
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -171,6 +173,7 @@ func Logout() http.HandlerFunc {
 			SameSite: http.SameSiteNoneMode,
 		})
 
-		http.Redirect(w, r, "/", http.StatusOK)
+		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
 	}
 }

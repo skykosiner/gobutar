@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"fmt"
+	"html"
+	"net/http"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,4 +27,10 @@ func SortItems(items []items.Item) {
 	sort.Slice(items, func(i, j int) bool {
 		return items[i].Name < items[j].Name
 	})
+}
+
+func HTMXError(w http.ResponseWriter, error string, status int) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(status)
+		fmt.Fprintf(w, `<p>%s</p>`, html.EscapeString(error))
 }
