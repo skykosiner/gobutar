@@ -32,5 +32,5 @@ func SortItems(items []items.Item) {
 func HTMXError(w http.ResponseWriter, error string, status int) {
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(status)
-		fmt.Fprintf(w, `<p>%s</p>`, html.EscapeString(error))
+	fmt.Fprintf(w, `<p>%s</p>`, html.EscapeString(error))
 }
