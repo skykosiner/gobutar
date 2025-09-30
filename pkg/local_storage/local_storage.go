@@ -10,7 +10,7 @@ func NewLocalStorage() *LocalStorage {
 	}
 }
 
-func (L *LocalStorage) Store(key, value string) {
+func (L *LocalStorage) Set(key, value string) {
 	L.items[key] = value
 }
 

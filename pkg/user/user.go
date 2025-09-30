@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	localstorage "github.com/skykosiner/gobutar/pkg/local_storage"
 	"github.com/skykosiner/gobutar/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,7 +55,7 @@ func (u User) validPassword(correctPassword string) bool {
 	return err == nil
 }
 
-func NewUser(db *sql.DB) http.HandlerFunc {
+func NewUser(db *sql.DB, localStorage localstorage.LocalStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var newUserReq User
 
@@ -70,7 +71,7 @@ func NewUser(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if _, err := db.Exec("INSERT INTO user (email, password) VALUES (?,?)", newUserReq.Email, newUserReq.Password); err != nil {
+		if _, err := db.Exec("INSERT INTO user (email, password, currency) VALUES (?,?,?)", newUserReq.Email, newUserReq.Password, localStorage.Get("currency")); err != nil {
 			slog.Error("Error creating new user.", "error", err, "new user", newUserReq)
 			utils.HTMXError(w, "Sorry there was an error please try again.", http.StatusBadRequest)
 			return
@@ -186,10 +187,11 @@ func Logout() http.HandlerFunc {
 	}
 }
 
-func SetCurrency() http.HandlerFunc {
+func SetCurrency(localStorage localstorage.LocalStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// var currency Currency
 		currency := r.FormValue("currency")
+		localStorage.Set("currency", currency)
 
 		fmt.Fprintln(w, "Successfully Set Currency")
 		w.WriteHeader(http.StatusOK)

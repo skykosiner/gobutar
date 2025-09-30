@@ -12,6 +12,7 @@ import (
 	"github.com/skykosiner/gobutar/pkg/budget"
 	"github.com/skykosiner/gobutar/pkg/components"
 	"github.com/skykosiner/gobutar/pkg/items"
+	localstorage "github.com/skykosiner/gobutar/pkg/local_storage"
 	"github.com/skykosiner/gobutar/pkg/sections"
 	"github.com/skykosiner/gobutar/pkg/transactions"
 	"github.com/skykosiner/gobutar/pkg/user"
@@ -78,13 +79,15 @@ func main() {
 		return
 	}
 
+	localStorage := localstorage.NewLocalStorage()
+
 	user.CheckFirstTime(db)
 
 	privateMux := http.NewServeMux()
 	publicMux := http.NewServeMux()
 
-	publicMux.HandleFunc("/api/user/set-currency", user.SetCurrency())
-	publicMux.HandleFunc("/api/user/sign-up", user.NewUser(db))
+	publicMux.HandleFunc("/api/user/set-currency", user.SetCurrency(*localStorage))
+	publicMux.HandleFunc("/api/user/sign-up", user.NewUser(db, *localStorage))
 	publicMux.HandleFunc("/api/user/login", user.Login(db))
 
 	privateMux.HandleFunc("/api/user/logout", user.Logout())
