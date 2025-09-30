@@ -46,16 +46,23 @@ templ Introduction() {
         background-color: var(--color-background-secondary);
         padding: 0.5rem;
     }
+
+    #response {
+        text-align: center;
+        padding-top: 0.7rem;
+    }
 </style>
 		<div class="slides">
 			<div class="slide" id="slide-1">
 				<h2>Please Set Your Currency</h2>
-				<form>
-					<select>
+				<form hx-post="/api/user/set-currency" hx-target="#response">
+					<select name="currency">
 						<option value="GBP">£ GBP</option>
 						<option value="USD">$ USD</option>
 					</select>
+					<input type="submit" value="Set Currency"/>
 				</form>
+                <div id="response"></div>
 			</div>
 			<div class="slide" id="slide-2">
 				<h2>Create Your Account</h2>

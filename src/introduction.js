@@ -42,3 +42,7 @@ export class Introduction {
         });
     }
 }
+
+export function setCurrency() {
+    alert("test");
+}

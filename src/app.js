@@ -80,3 +80,8 @@ function newTransaction() {
     }
 }
 
+
+function setCurrency() {
+    console.log("test");
+    alert("test");
+}

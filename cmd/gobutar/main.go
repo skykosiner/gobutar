@@ -83,6 +83,7 @@ func main() {
 	privateMux := http.NewServeMux()
 	publicMux := http.NewServeMux()
 
+	publicMux.HandleFunc("/api/user/set-currency", user.SetCurrency())
 	publicMux.HandleFunc("/api/user/sign-up", user.NewUser(db))
 	publicMux.HandleFunc("/api/user/login", user.Login(db))
 
@@ -138,8 +139,11 @@ func main() {
 	})
 
 	finalMux := http.NewServeMux()
-	finalMux.Handle("/api/user/login", publicMux)
+
+	finalMux.Handle("/api/user/set-currency", publicMux)
 	finalMux.Handle("/api/user/sign-up", publicMux)
+	finalMux.Handle("/api/user/login", publicMux)
+
 	finalMux.Handle("/src/", publicMux)
 	finalMux.Handle("/", user.FirstTime(db, user.IsUserLoggedIn(privateMux)))
 	// finalMux.Handle("/", privateMux)

@@ -3,12 +3,20 @@ package user
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/skykosiner/gobutar/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
+)
+
+type Currency = string
+
+const (
+	GBP Currency = "GBP"
+	USD Currency = "USD"
 )
 
 type User struct {
@@ -174,6 +182,17 @@ func Logout() http.HandlerFunc {
 		})
 
 		w.Header().Set("HX-Redirect", "/")
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func SetCurrency() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// var currency Currency
+		currency := r.FormValue("currency")
+		fmt.Println(currency)
+
+		fmt.Fprintln(w, "Successfully Set Currency")
 		w.WriteHeader(http.StatusOK)
 	}
 }
