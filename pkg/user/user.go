@@ -190,7 +190,6 @@ func SetCurrency() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// var currency Currency
 		currency := r.FormValue("currency")
-		fmt.Println(currency)
 
 		fmt.Fprintln(w, "Successfully Set Currency")
 		w.WriteHeader(http.StatusOK)

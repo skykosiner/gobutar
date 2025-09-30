@@ -2,3 +2,4 @@ node_modules/
 gobutar.db
 main
 *_templ.go
+tmp/
