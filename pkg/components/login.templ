@@ -20,7 +20,7 @@ templ Login() {
 </style>
 		<div class="center">
 			<h1>Login</h1>
-			<form hx-post="/api/user/login" hx-ext="json-enc" hx-target="#login-resp" hx-swap="innerHTML">
+			<form hx-post="/api/user/login" hx-ext="json-enc">
 				<input type="email" name="email" placeholder="Email: "/>
 				<input type="password" name="password" placeholder="Password: "/>
 				<input type="submit" value="Login"/>
