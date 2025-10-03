@@ -18,14 +18,22 @@ templ Login() {
         padding: 0.5rem;
     }
 </style>
+		<script type="text/javascript">
+    document.body.addEventListener('htmx:beforeSwap', function (evt) {
+        if (evt.detail.xhr.status === 401) {
+            evt.detail.shouldSwap = true;
+            evt.detail.isError = true;
+        }
+    })
+</script>
 		<div class="center">
 			<h1>Login</h1>
-			<form hx-post="/api/user/login" hx-ext="json-enc">
+			<form hx-target="#response" hx-post="/api/user/login" hx-ext="json-enc">
 				<input type="email" name="email" placeholder="Email: "/>
 				<input type="password" name="password" placeholder="Password: "/>
 				<input type="submit" value="Login"/>
 			</form>
-			<div id="login-resp"></div>
+			<div id="response"></div>
 		</div>
 	}
 }

@@ -129,19 +129,19 @@ func Login(db *sql.DB) http.HandlerFunc {
 		}
 
 		var dbUser User
-		if err := rows.Scan(&dbUser.Email, &dbUser.Password); err != nil {
+		if err := rows.Scan(&dbUser.Email, &dbUser.Password, &dbUser.Currency); err != nil {
 			slog.Error("Error getting your user from the database.", "error", err)
 			utils.HTMXError(w, "Error getting your info from the database. Please try again.", http.StatusInternalServerError)
 			return
 		}
 
 		if loginRequest.Email != dbUser.Email {
-			utils.HTMXError(w, "The email you entered isn't correct.", http.StatusBadRequest)
+			utils.HTMXError(w, "The email you entered isn't correct.", http.StatusUnauthorized)
 			return
 		}
 
-		if !loginRequest.validPassword(dbUser.Password) {
-			utils.HTMXError(w, "Your password is incorrect.", http.StatusUnauthorized)
+			if !loginRequest.validPassword(dbUser.Password) {
+				utils.HTMXError(w, "Your password is incorrect.", http.StatusUnauthorized)
 			return
 		}
 
